@@ -7,7 +7,7 @@
 
 namespace wc {
 
-static Serializer::BufferType buffer; // TODO thread safe
+static BufferType buffer; // TODO thread safe
 static std::bad_alloc nomem;
 
 static bool serialize = false; // TODO thread safe
@@ -24,7 +24,7 @@ void Serializer::callback_two()
 	serialize = false;
 }
 
-const Serializer::BufferType* Serializer::GetBuffer()
+const BufferType* GetBuffer()
 {
 	return &buffer;
 }
@@ -60,6 +60,23 @@ void buffer2memory(void** p)
 	*p = (void*)((std::ptrdiff_t)(*p) + (std::ptrdiff_t)p);
 }
 
+bool WriteBuffer(FILE* f)
+{
+	return fwrite(buffer.data(), sizeof(BufferType::value_type), buffer.size(), f) == buffer.size();
+}
+
+bool ReadBuffer(FILE* f, size_t s)
+{
+	if (s == 0)
+	{
+		fseek(f, 0, SEEK_END); // TODO 64 bit files
+		s = ftell(f);
+		fseek(f, 0, SEEK_SET);
+	}
+	buffer.resize(s);
+	return fread(buffer.data(), sizeof(BufferType::value_type), s, f) == buffer.size();
+}
+
 }
 
 void* operator new (size_t count, const std::nothrow_t& tag) throw()
@@ -67,7 +84,7 @@ void* operator new (size_t count, const std::nothrow_t& tag) throw()
 	if (wc::serialize)
 	{
 		const auto former_size = wc::buffer.size();
-		const auto former_size_round = ((former_size + (sizeof(void*) - 1)) / sizeof(void*)) * sizeof(void*);
+		const auto former_size_round = wc::RoundD<decltype(former_size), std::alignment_of<void*>::value>::Do(former_size); // ((former_size + (sizeof(void*) - 1)) / sizeof(void*)) * sizeof(void*);
 		wc::serialize = false; // TODO write C-style buffer in order to eliminate further calls of operator-new!
 		try{
 			wc::buffer.resize(former_size_round + count);

@@ -4,52 +4,20 @@
 #include <sys/types.h>
 #include <new>
 #include <vector>
+#include <type_traits>
+#include <stdio.h>
+
+#include "wc_inheritance.h"
+#include "wc_member.h"
 
 void* operator new  (size_t count);
 void* operator new  (size_t count, const std::nothrow_t& tag) throw();
 
 namespace wc {
 
+#define WC_ERROR_MESSAGE1 "This object is not trivially copyable, please override its serialization method. See http://www.cplusplus.com/reference/type_traits/is_trivially_copyable/"
+
 // see https://social.msdn.microsoft.com/Forums/en-US/9ac98582-ea26-4349-aafb-5678aca73eef/pointertomember-template-arguments-in-variadic-templates?forum=vcgeneral
-
-//! this is for iterating over the members (compile time)
-template <class C, typename ...Arguments>
-struct Members
-{
-	static void Do(C* x);
-	static void UnDo(C* x);
-};
-
-template <class C, class W, typename ...Arguments>
-struct Members<C, W, Arguments...>
-{
-	static void Do(C* x)
-	{
-		W::Do(x);
-		Members<C, Arguments...>::Do(x);
-	}
-	static void UnDo(C* x)
-	{
-		W::UnDo(x);
-		Members<C, Arguments...>::UnDo(x);
-	}
-};
-
-//! packs members together
-template <class C>
-struct Members<C>
-{
-	//! empty members do nothing
-	static void Do(C* x){}
-	static void UnDo(C* x){}
-};
-
-template<class C>
-struct MyMembers
-{
-	//! by default, the class C has an empty member list
-	typedef Members<C> List;
-};
 
 //! custom callback
 template<class Class>
@@ -64,6 +32,9 @@ public:
 	}
 };
 
+/************************************************************************/
+/* Stitcher                                                             */
+/************************************************************************/
 //! makes the pointers relative
 template<class Class>
 class Stitcher
@@ -72,21 +43,34 @@ public:
 	static void Do(Class* x)
 	{
 		Callback<Class>::Do(x);
+		MyParents<Class>::List::Do(x);
 		MyMembers<Class>::List::Do(x);
 	}
 	static void UnDo(Class* x)
 	{
-		MyMembers<Class>::List::UnDo(x);
+        MyMembers<Class>::List::UnDo(x);
+		MyParents<Class>::List::UnDo(x);
 		Callback<Class>::UnDo(x);
 	}
 };
 
+template<class Int, size_t d>
+struct RoundD
+{
+	static Int Do(const Int& i)
+	{
+		return ((i + d - 1) / d)*d;
+	}
+};
 
 //! translates pointers to relative pointers
 void memory2buffer(void** p);
 //! translates relative pointers to absolute pointers
 void buffer2memory(void** p);
 
+/************************************************************************/
+/* Various types of members                                             */
+/************************************************************************/
 //! packs a member
 template <class C, size_t offset, typename T>
 struct Member {
@@ -130,15 +114,42 @@ struct Responsible
 	}
 };
 
+//! No way, man!
+/*!
+	see http://stackoverflow.com/questions/9889488/can-we-make-a-class-copy-constructor-virtual-in-c
+*/
+template <class C, size_t offset, typename T>
+struct Polymorphic
+{
+};
+
+template<class C>
+struct MembersHelper
+{
+    template<size_t offset, typename T>
+    struct M
+    {
+        typedef Member<C, offset, T> value;
+    };
+    template<size_t offset>
+    struct P
+    {
+        typedef Pointer<C, offset> value;
+    };
+};
+
+typedef std::vector<unsigned char> BufferType;
+const BufferType* GetBuffer();
+bool WriteBuffer(FILE*);
+//! zero length means the all of it
+bool ReadBuffer(FILE*, size_t s = 0);
+
 class Serializer
 {
-public:
-	typedef std::vector<unsigned char> BufferType;
 private:
 	static void callback_one();
 	static void callback_two();
 public:
-	static const BufferType* GetBuffer();
 	//! Serializes a given object
 	/*!
 	@param object a pointer to the object to serialize

@@ -3,10 +3,17 @@
 
 #include "wc_core.h"
 
-#ifdef WC_NETWORK
-
 namespace wc
 {
+
+    template<size_t size>
+    struct ByteReorder
+    {
+        static void Do(void* c){}
+        static void UnDo(void* c){}
+    };
+
+#ifdef WC_NETWORK
     void reorderbool(bool* x);
     void deorderbool(bool* x);
     
@@ -18,13 +25,6 @@ namespace wc
     
     void reorder8(void* x);
     void deorder8(void* x);
-
-    template<size_t size>
-    struct ByteReorder
-    {
-        static void Do(void* c){}
-        static void UnDo(void* c){}
-    };
 
     template<>
     struct ByteReorder<2>
@@ -46,37 +46,7 @@ namespace wc
         static void Do(void* c){ reorder8(c); }
         static void UnDo(void* c){ deorder8(c); }
     };
-
-    template<class Class>
-    class StitcherProxy<Class, true>
-    {
-    public:
-        static void Do(Class* x)
-        {
-            ByteReorder<sizeof(Class)>::Do(x);
-        }
-        static void UnDo(Class* x)
-        {
-            ByteReorder<sizeof(Class)>::UnDo(x);
-        }
-    };
-
-    template<>
-    class StitcherProxy<bool, true>
-    {
-    public:
-        static void Do(bool* x)
-        {
-            reorderbool(x);
-        }
-        static void UnDo(bool* x)
-        {
-            deorderbool(x);
-        }
-    };
-
-}
-
 #endif // WC_NETWORK
+}
 
 #endif // INCLUDE_WC_NETWORK_H

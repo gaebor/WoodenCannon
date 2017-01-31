@@ -9,6 +9,7 @@
 
 #include "wc_inheritance.h"
 #include "wc_member.h"
+#include "wc_network.h"
 
 void* operator new  (size_t count);
 void* operator new  (size_t count, const std::nothrow_t& tag) throw();

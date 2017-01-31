@@ -27,6 +27,9 @@
 *.out
 *.app
 
+#test files
+*.bin
+
 # =========================
 # Operating System Files
 # =========================

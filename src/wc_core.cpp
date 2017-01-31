@@ -37,7 +37,9 @@ void Serializer::print_buffer()
         if (i % sizeof(void*) == 0)
         {
             std::cout.fill(' ');
-            std::cout << "\n"; std::cout.width(4); std::cout << i << ". ("; std::cout.width(16); std::cout << i + (*(std::ptrdiff_t*)(buffer.data() + i)) << ") ";
+            auto ptr = *(std::ptrdiff_t*)(buffer.data() + i);
+            ByteReorder<sizeof(ptr)>::UnDo(&ptr);
+            std::cout << "\n"; std::cout.width(4); std::cout << i << ". ("; std::cout.width(16); std::cout << i + ptr << ") ";
         }
         std::cout.fill('0'); std::cout.width(2);
         std::cout << std::hex << (int)(buffer[i]) << std::dec;
@@ -53,15 +55,15 @@ void Serializer::set_max(size_t bytes)
 void memory2buffer(void** p)
 {
     auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p;
-    //if (0 <= relative && relative <= buffer.size())
-      *p = (void*)relative;
+    *p = (void*)relative;
+    ByteReorder<sizeof(void*)>::Do(p);
 }
 
 void buffer2memory(void** p)
 {
+    ByteReorder<sizeof(void*)>::UnDo(p);
     auto const absolute = (std::ptrdiff_t)(*p) + (std::ptrdiff_t)p;
-    //if ((std::ptrdiff_t)(buffer.data()) <= absolute && absolute <= (std::ptrdiff_t)(&*buffer.end()))
-        *p = (void*)absolute;
+    *p = (void*)absolute;
 }
 
 bool WriteBuffer(FILE* f)

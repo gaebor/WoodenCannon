@@ -5,7 +5,6 @@
 
 namespace wc
 {
-
     template<size_t size>
     struct ByteReorder
     {
@@ -14,6 +13,7 @@ namespace wc
     };
 
 #ifdef WC_NETWORK
+    //! bool should occupy one byte, but its representation is not defined!
     void reorderbool(bool* x);
     void deorderbool(bool* x);
     

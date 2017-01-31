@@ -39,7 +39,8 @@ void Serializer::print_buffer()
             std::cout.fill(' ');
             auto ptr = *(std::ptrdiff_t*)(buffer.data() + i);
             ByteReorder<sizeof(ptr)>::UnDo(&ptr);
-            std::cout << "\n"; std::cout.width(4); std::cout << i << ". ("; std::cout.width(16); std::cout << i + ptr << ") ";
+            std::cout << "\n"; std::cout.width(4); std::cout << i <<
+                ".\t("; std::cout.width(20); std::cout << i + ptr << ")\t";
         }
         std::cout.fill('0'); std::cout.width(2);
         std::cout << std::hex << (int)(buffer[i]) << std::dec;

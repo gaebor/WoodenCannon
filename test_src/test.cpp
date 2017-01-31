@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     z.a = 5;
     z.b = 'a';
     z.x = 7;
-    z.flag = false;
+    z.flag = true;
 
     add.a = 5; add.b = 7;
     

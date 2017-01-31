@@ -12,8 +12,17 @@ Tale about the wooden cannon of [Tihany](https://en.wikipedia.org/wiki/Tihany)
 ## Compile
  * `make` with gnu make
  * `nmake /F Makefile.mak` with Visual C++ Command Prompt
+ * There is a Visual Studio solution under `windows/windows.sln`
 
 ## Usage
  * include `src/wc.h`
  * link against the static library `wc`
  * see the `test` executable for example usage
+
+## Test
+This application constructs and serializes various objects. Then reconstructs and compares whether the reconstruction was successful.
+If the reconstruction was successful, the serialized objects are dumped into binary files.
+If any of the objects fail to reconstruct, then the fail is reported.
+
+If you run the `test` for the second time, it reads the serialized dump files and does the reconstruction from them.
+Again, if any of the objects fail to reconstruct, then the fail is reported.

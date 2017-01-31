@@ -20,4 +20,4 @@ src/wc_core.obj:src/wc_core.cpp
 	cl $(CPPFLAGS) /Fo"src/" /c src/*.cpp
 
 clean:
-	del /Q config.exe wc.lib test.exe src\*.obj test_src\*.obj
+	del /Q *.lib *.exe src\*.obj test_src\*.obj *.bin

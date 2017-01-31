@@ -37,7 +37,7 @@ void Serializer::print_buffer()
         if (i % sizeof(void*) == 0)
         {
             std::cout.fill(' ');
-            std::cout << "\n"; std::cout.width(4); std::cout << i << ". ("; std::cout.width(16); std::cout << i + (*(size_t*)(buffer.data() + i)) << ") ";
+            std::cout << "\n"; std::cout.width(4); std::cout << i << ". ("; std::cout.width(16); std::cout << i + (*(std::ptrdiff_t*)(buffer.data() + i)) << ") ";
         }
         std::cout.fill('0'); std::cout.width(2);
         std::cout << std::hex << (int)(buffer[i]) << std::dec;

@@ -68,6 +68,21 @@ int main(int argc, char* argv[])
     cc.v.push_back(0);
     cc.vv.push_back(1);
 
+    std::vector<Add> addons(2);
+    addons[0] = add;
+    add.b -= 1;
+    addons[1] = add;
+
+    std::map<char, Add> addons2;
+    addons2['#'] = add;
+    add.b += 1;
+    addons2['a'] = add;
+
+    std::vector<std::vector<unsigned char>> m(2);
+    m[0].resize(2); m[1].resize(5);
+    m[0][0] = 1; m[0][1] = 2;
+    m[1][0] = 3; m[1][1] = 4; m[1][2] = 5; m[1][3] = 6; m[1][4] = 7;
+
     printf("Z ");
     Test(&z, "Z.bin");
 
@@ -80,23 +95,8 @@ int main(int argc, char* argv[])
     printf("ComplexChild ");
     Test(&cc, "cc.bin");
 
-    std::vector<Add> addons(2);
-    addons[0] = add;
-    add.b -= 1;
-    addons[1] = add;
-    
     printf("Vector of Add ");
     Test(&addons, "vector_add.bin");
-
-    std::map<char, Add> addons2;
-    addons2['#'] = add;
-    add.b += 1;
-    addons2['a'] = add;
-
-    std::vector<std::vector<unsigned char>> m(2);
-    m[0].resize(2); m[1].resize(5);
-    m[0][0] = 1; m[0][1] = 2;
-    m[1][0] = 3; m[1][1] = 4; m[1][2] = 5; m[1][3] = 6; m[1][4] = 7;
 
     printf("vector of vector ");
     Test(&m, "vector_vector.bin");

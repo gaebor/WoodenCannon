@@ -6,8 +6,11 @@ namespace wc{
     template <class C, typename ...Arguments>
     struct Members
     {
+        //! stitch member
         static void Do(C* x);
+        //! un-stitch member
         static void UnDo(C* x);
+        //! you can call your function for the members in a for loop
         template<typename F>
         static void Do(F f, C* x);
     };
@@ -15,6 +18,7 @@ namespace wc{
     template <class C, class M, typename ...Arguments>
     struct Members<C, M, Arguments...>
     {
+        typedef Members<C, Arguments...> Next;
         static void Do(C* x)
         {
             M::Do(x);

@@ -13,11 +13,14 @@ namespace wc{
 #pragma region vector
 
 template <class Ty, class All>
-struct MyMembers<std::vector<Ty, All>> : public MembersHelper<std::vector<Ty, All>>
+struct MyMembers<std::vector<Ty, All>> : MembersHelper<std::vector<Ty, All>>
 {
     typedef std::vector<Ty, All> container;
 #ifdef _MSC_VER
     typedef Members < container,
+#ifdef _DEBUG
+        typename R<offsetof(container, _Myproxy), std::_Container_proxy>::Type,
+#endif // _DEBUG
         typename P<offsetof(container, _Myfirst)>::Type,
         typename P<offsetof(container, _Mylast) >::Type,
         typename P<offsetof(container, _Myend)  >::Type> List;
@@ -27,26 +30,46 @@ struct MyMembers<std::vector<Ty, All>> : public MembersHelper<std::vector<Ty, Al
 #endif // PLATFORM
 };
 
+#ifdef _MSC_VER
+template <>
+struct MyMembers<std::_Container_proxy> : MembersHelper<std::_Container_proxy>
+{
+    typedef Members < std::_Container_proxy,
+    // this is left out intentionally!
+    //typename P<offsetof(std::_Container_proxy, _Myfirstiter)>::Type,
+    typename P<offsetof(std::_Container_proxy, _Mycont)     >::Type > List;
+};
+#endif // _MSC_VER
+
 template <class Ty, class All>
 struct Callback<std::vector<Ty, All>>
 {
     typedef std::vector<Ty, All> container;
+#if defined(_MSC_VER) && defined(_DEBUG)
+    typedef typename MyMembers<container>::List::Next Hacker;
+#else
+    typedef typename MyMembers<container>::List Hacker;
+#endif
     static void Do(container* v)
     {
         if (v->empty())
-        { //TODO problem!
-            auto const end = (Ty*)(v + 1);
-            MyMembers<container>::List::Do([&end](void** x){*x = end; }, v);
+        {   //hack!
+            auto const end = (void**)(v + 1);
+            Hacker::Do([&end](void** x){*x = end; }, v);
         }else
             for (auto& m : *v)
                 Stitcher<typename container::value_type>::Do(&m);
     }
     static void UnDo(container* v)
-    {//TODO problem!
-        if (v->begin() == v->end())
+    {   //hack!
+        auto const end = (void**)(v + 1);
+        bool hacked = true;
+        Hacker::Do([&end, &hacked](void** x){hacked = hacked && (*x == end); }, v);
+        if (hacked)
         {
-            v->clear();
-        }else
+            Hacker::Do([&end](void** x){*x = nullptr; }, v);
+        }
+        else
             for (auto& m : *v)
                 Stitcher<typename container::value_type>::UnDo(&m);
     }

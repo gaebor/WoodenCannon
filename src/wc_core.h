@@ -85,10 +85,10 @@ void buffer2memory(void** p);
 /************************************************************************/
 /* Various types of members                                             */
 /************************************************************************/
-//! packs a member
-template <class C, size_t of, typename T>
+//! packs an ordinary member
+template <class C, size_t _offset, typename T>
 struct Member {
-    static const size_t offset = of;
+    static const size_t offset = _offset;
     typedef T Type;
     typedef C Base;
 
@@ -103,10 +103,11 @@ struct Member {
 };
 
 //! a member pointer, which is not to be copied
-template <class C, size_t of>
+template <class C, size_t _offset, typename T = void>
 struct Pointer
 {
-    static const size_t offset = of;
+    static const size_t offset = _offset;
+    typedef T* Type;
     typedef C Base;
 
     static void Do(C* c)
@@ -120,18 +121,22 @@ struct Pointer
 };
 
 //! a member pointer, the object is responsible for it
-template <class C, size_t offset, typename T>
+template <class C, size_t _offset, typename T>
 struct Responsible
 {
+    static const size_t offset = _offset;
+    typedef T Type;
+    typedef C Base;
+
     static void Do(C* c)
     {
-        Stitcher<T*>::Do(*(T**)((size_t)c + offset));
+        Stitcher<T>::Do(*(T**)((size_t)c + offset));
         memory2buffer((void**)((size_t)c + offset));
     }
     static void UnDo(C* c)
     {
         buffer2memory((void**)((size_t)c + offset));
-        Stitcher<T*>::UnDo(*(T**)((size_t)c + offset));
+        Stitcher<T>::UnDo(*(T**)((size_t)c + offset));
     }
 };
 
@@ -152,10 +157,15 @@ struct MembersHelper
     {
         typedef Member<C, offset, T> Type;
     };
-    template<size_t offset>
+    template<size_t offset, typename T = void>
     struct P
     {
-        typedef Pointer<C, offset> Type;
+        typedef Pointer<C, offset, T> Type;
+    };
+    template<size_t offset, typename T>
+    struct R
+    {
+        typedef Responsible<C, offset, T> Type;
     };
 };
 

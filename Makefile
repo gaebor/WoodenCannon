@@ -27,4 +27,4 @@ libwc.a: $(TRGT_OBJS)
 	ar rcs $@ $(TRGT_OBJS)
 
 clean:
-	rm -f test_src/*.o src/*.o *.a $(TARGETS)
+	rm -f test_src/*.o src/*.o *.a $(TARGETS) *.bin

@@ -8,6 +8,8 @@ namespace wc{
     {
         static void Do(C* x);
         static void UnDo(C* x);
+        template<typename F>
+        static void Do(F f, C* x);
     };
 
     template <class C, class M, typename ...Arguments>
@@ -23,6 +25,12 @@ namespace wc{
             M::UnDo(x);
             Members<C, Arguments...>::UnDo(x);
         }
+        template<typename F>
+        static void Do(F f, C* x)
+        {
+            f((void**)((char*)x + M::offset));
+            Members<C, Arguments...>::Do(f, x);
+        }
     };
 
     //! packs members together
@@ -32,6 +40,8 @@ namespace wc{
         //! if there aren't any members then does nothing
         static void Do(C* x){}
         static void UnDo(C* x){}
+        template<typename F>
+        static void Do(F f, C* x){}
     };
 
     template<class C>

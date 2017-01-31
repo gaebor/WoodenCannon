@@ -35,9 +35,9 @@ public:
 /************************************************************************/
 /* Stitcher                                                             */
 /************************************************************************/
-//! makes the pointers relative
-template<class Class>
-class Stitcher
+
+template<class Class, bool>
+class StitcherProxy
 {
 public:
     static void Do(Class* x)
@@ -51,6 +51,20 @@ public:
         MyMembers<Class>::List::UnDo(x);
         MyParents<Class>::List::UnDo(x);
         Callback<Class>::UnDo(x);
+    }
+};
+
+template<class Class>
+class Stitcher
+{
+public:
+    static void Do(Class* x)
+    {
+        StitcherProxy<Class, std::is_fundamental<Class>::value>::Do(x);
+    }
+    static void UnDo(Class* x)
+    {
+        StitcherProxy<Class, std::is_fundamental<Class>::value>::UnDo(x);
     }
 };
 
@@ -72,8 +86,12 @@ void buffer2memory(void** p);
 /* Various types of members                                             */
 /************************************************************************/
 //! packs a member
-template <class C, size_t offset, typename T>
+template <class C, size_t of, typename T>
 struct Member {
+    static const size_t offset = of;
+    typedef T Type;
+    typedef C Base;
+
     static void Do(C* c)
     {
         Stitcher<T>::Do((T*)((size_t)c + offset));
@@ -85,9 +103,12 @@ struct Member {
 };
 
 //! a member pointer, which is not to be copied
-template <class C, size_t offset>
+template <class C, size_t of>
 struct Pointer
 {
+    static const size_t offset = of;
+    typedef C Base;
+
     static void Do(C* c)
     {
         memory2buffer((void**)((size_t)c + offset));
@@ -140,8 +161,12 @@ struct MembersHelper
 
 typedef std::vector<unsigned char> BufferType;
 const BufferType* GetBuffer();
+//! Writes the current buffer into a file, as-is
 bool WriteBuffer(FILE*);
-//! zero length means the all of it
+//! Reads the content of a file into the current buffer, as-is
+/*!
+    @param s reads only s bytes from file, zero length means the all of it
+*/
 bool ReadBuffer(FILE*, size_t s = 0);
 
 class Serializer
@@ -162,6 +187,7 @@ public:
         // this is where the magic happens
         auto serialized = new Class(*object);
         callback_two();
+        // this is where the stitching happens
         Stitcher<Class>::Do(serialized);
         return GetBuffer();
     }
@@ -171,9 +197,9 @@ public:
     {
         // this thing is a pointer to a broken object
         auto thing = (Class*)(GetBuffer()->data());
-        // this is where it gets untangled
+        // this is where it gets untangled (un-stitched)
         Stitcher<Class>::UnDo(thing);
-        //! calls a decent copy constructor, the buffer now contains a proper Class object
+        // calls a decent copy constructor, the buffer now contains a proper Class object
         new (place)Class(*thing);
     }
     template<class Class>
@@ -183,7 +209,7 @@ public:
         Stitcher<Class>::UnDo(thing);
         return new Class(*thing);
     }
-
+    //! pretty prints the content of the buffer to stdout
     static void print_buffer();
     //! sets maximum length of serialized buffer
     /*!

@@ -33,13 +33,22 @@ struct Callback<std::vector<Ty, All>>
     typedef std::vector<Ty, All> container;
     static void Do(container* v)
     {
-        for (auto& m : *v)
-            Stitcher<typename container::value_type>::Do(&m);
+        if (v->empty())
+        { //TODO problem!
+            auto const end = (Ty*)(v + 1);
+            MyMembers<container>::List::Do([&end](void** x){*x = end; }, v);
+        }else
+            for (auto& m : *v)
+                Stitcher<typename container::value_type>::Do(&m);
     }
     static void UnDo(container* v)
-    {
-        for (auto& m : *v)
-            Stitcher<typename container::value_type>::UnDo(&m);
+    {//TODO problem!
+        if (v->begin() == v->end())
+        {
+            v->clear();
+        }else
+            for (auto& m : *v)
+                Stitcher<typename container::value_type>::UnDo(&m);
     }
 };
 

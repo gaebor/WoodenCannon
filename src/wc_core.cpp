@@ -52,12 +52,16 @@ void Serializer::set_max(size_t bytes)
 
 void memory2buffer(void** p)
 {
-    *p = (void*)((std::ptrdiff_t)(*p) - (std::ptrdiff_t)p);
+    auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p;
+    //if (0 <= relative && relative <= buffer.size())
+      *p = (void*)relative;
 }
 
 void buffer2memory(void** p)
 {
-    *p = (void*)((std::ptrdiff_t)(*p) + (std::ptrdiff_t)p);
+    auto const absolute = (std::ptrdiff_t)(*p) + (std::ptrdiff_t)p;
+    //if ((std::ptrdiff_t)(buffer.data()) <= absolute && absolute <= (std::ptrdiff_t)(&*buffer.end()))
+        *p = (void*)absolute;
 }
 
 bool WriteBuffer(FILE* f)
@@ -81,10 +85,12 @@ bool ReadBuffer(FILE* f, size_t s)
 
 void* operator new (size_t count, const std::nothrow_t& tag) throw()
 {
-    if (wc::serialize)
+    switch (wc::serialize)
+    {
+    case true:
     {
         const auto former_size = wc::buffer.size();
-        const auto former_size_round = wc::RoundD<decltype(former_size), std::alignment_of<void*>::value>::Do(former_size); // ((former_size + (sizeof(void*) - 1)) / sizeof(void*)) * sizeof(void*);
+        const auto former_size_round = wc::RoundD<size_t, std::alignment_of<void*>::value>::Do(former_size);
         wc::serialize = false; // TODO write C-style buffer in order to eliminate further calls of operator-new!
         try{
             wc::buffer.resize(former_size_round + count);
@@ -95,9 +101,11 @@ void* operator new (size_t count, const std::nothrow_t& tag) throw()
         }
         wc::serialize = true;
         return wc::buffer.data() + former_size_round;
-    }
-    else
+    }break;
+    default:
         return malloc(count);
+        break;
+    }        
 }
 
 void* operator new (size_t count)

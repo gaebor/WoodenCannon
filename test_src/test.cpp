@@ -14,40 +14,47 @@ using namespace wc;
 template<typename T>
 void Test(T* t, const char* fname)
 {
-    T reference;
-    FILE* f = fopen(fname, "rb");
-    if (f)
-    {   // reads from file into buffer
-        ReadBuffer(f);
-        fclose(f);
-    }
-    else
-    {  // serializes
-        Serializer::Do(t);
-    }
-
-    Serializer::print_buffer();
-    std::cout << std::endl;
-
-    auto buffer = *wc::GetBuffer();
-
-    // de-serializes
-    Serializer::UnDo(&reference);
-    // and then compare
-    if (!(reference == *t))
+    try
     {
-        fprintf(stderr, "Failed!\n");
-        exit(1);
-    }
-    { // if successful then write serialized object into file
+        T reference;
+        FILE* f = fopen(fname, "rb");
+        if (f)
+        {   // reads from file into buffer
+            ReadBuffer(f);
+            fclose(f);
+        }
+        else
+        {  // serializes
+            Serializer::Do(t);
+        }
+
+        Serializer::print_buffer();
+        std::cout << std::endl;
+
+        auto buffer = *wc::GetBuffer();
+
+        // de-serializes
+        Serializer::UnDo(&reference);
+        // and then compare
+        if (!(reference == *t))
+        {
+            fprintf(stderr, "Failed!\n");
+            exit(1);
+        }
+        // if successful then write serialized object into file
         f = fopen(fname, "wb");
         if (f)
         {
             fwrite(buffer.data(), sizeof(wc::BufferType::value_type), buffer.size(), f);
             fclose(f);
         }
-    }
     // de-constructs reference
+    }
+    catch (...)
+    {
+        fprintf(stderr, "Failed!\n");
+        exit(1);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -114,6 +121,7 @@ int main(int argc, char* argv[])
     printf("empty list ");
     Test(&l, "list_empty.bin");
 
+    printf("Succeeded!\n");
     return 0;
 
     printf("Map of Add ");

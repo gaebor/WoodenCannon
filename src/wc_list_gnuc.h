@@ -7,20 +7,6 @@
 namespace wc
 {
     typedef std::__detail::_List_node_base nodebase;
-    template <class Ty, class All>
-    struct MyMembers<std::list<Ty, All>>
-        :   MembersHelper<std::list<Ty, All>>
-    {
-        typedef std::list<Ty, All> container;
-        struct Base : container
-        {
-            static const size_t offset = offsetof(Base, _M_impl._M_node);
-        };
-        
-        typedef Members < container,
-            Member<container, Base::offset, nodebase>
-        > List;
-    };
 
     template<>
     struct MyMembers<nodebase> : MembersHelper<nodebase>
@@ -52,26 +38,27 @@ namespace wc
         typedef std::list<Ty, All> container;
         static void Do(container* v)
         {
-            auto wtf = &(((Callback<container>*)(v))->_M_impl._M_node);
-            for (
-                auto ptr = static_cast<std::_List_node<Ty>*>(wtf->_M_next);
-                ptr != wtf; )
+            auto const wtf = &(((Callback<container>*)(v))->_M_impl._M_node);
+            auto ptr = wtf->_M_next;
+            Stitcher<nodebase>::Do(wtf);
+            do
             {
-                auto const next = static_cast<std::_List_node<Ty>*>(ptr->_M_next);
-                Stitcher<std::_List_node<Ty>>::Do(ptr);
+                auto const next = ptr->_M_next;
+                Stitcher<std::_List_node<Ty>>::Do(
+                    static_cast<std::_List_node<Ty>*>(ptr)
+                    );
                 ptr = next;
-            }
+            } while (ptr != wtf);
         }
         static void UnDo(container* v)
         {
-            auto wtf = &(((Callback<container>*)(v))->_M_impl._M_node);
-            Stitcher<std::__detail::_List_node_base>::UnDo(wtf);
-            for (
-                auto ptr = static_cast<std::_List_node<Ty>*>(wtf->_M_next);
-                ptr != wtf;)
+            auto const wtf = &(((Callback<container>*)(v))->_M_impl._M_node);
+            Stitcher<nodebase>::UnDo(wtf);
+            for (auto ptr = wtf->_M_next; ptr != wtf; ptr = ptr->_M_next)
             {
-                ptr = static_cast<std::_List_node<Ty>*>(ptr->_M_next);
-                Stitcher<std::_List_node<Ty>>::UnDo(ptr);
+                Stitcher<std::_List_node<Ty>>::UnDo(
+                    static_cast<std::_List_node<Ty>*>(ptr)
+                    );
             }
         }
     };

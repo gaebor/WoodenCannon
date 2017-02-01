@@ -6,14 +6,15 @@ TRGT_SRCS=$(wildcard src/*.cpp)
 TEST_OBJS=$(TEST_SRCS:cpp=o)
 TRGT_OBJS=$(TRGT_SRCS:cpp=o)
 
-test: $(TEST_SRCS) lib
-	g++ $(CPPFLAGS) -L. $(TEST_SRCS) -lwc -o $@
+test: $(TEST_OBJS) lib
+	g++ $(CPPFLAGS) -L. $(TEST_OBJS) -lwc -o $@
 
+test_src/%.o :: test_src/%.cpp
 src/%.o :: src/%.cpp
 .o : .cpp
 	g++ $(CPPFLAGS) -L. $< -o $@
     
-all: test
+all: clean test
 
 lib: libwc.a
 

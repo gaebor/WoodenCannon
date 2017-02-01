@@ -83,6 +83,9 @@ int main(int argc, char* argv[])
     m[0][0] = 1; m[0][1] = 2;
     m[1][0] = 3; m[1][1] = 4; m[1][2] = 5; m[1][3] = 6; m[1][4] = 7;
 
+    std::list<char> l = { 'A', '0', '#' };
+    std::list<Add> l2(addons.begin(), addons.end());
+
     printf("Z ");
     Test(&z, "Z.bin");
 
@@ -101,14 +104,20 @@ int main(int argc, char* argv[])
     printf("vector of vector ");
     Test(&m, "vector_vector.bin");
 
+    printf("list of char ");
+    Test(&l, "list.bin");
+
+    printf("list of Add ");
+    Test(&l2, "list2.bin");
+
+    l.clear();
+    printf("empty list ");
+    Test(&l, "list_empty.bin");
+
     return 0;
 
     printf("Map of Add ");
     Test(&addons2, "map_add.bin");
-
-    std::list<char> l = { 'A', '0', '#' };
-    printf("list ");
-    Test(&l, "list.bin");
 
     return 0;
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include <type_traits>
 #include <stdio.h>
+#include <stddef.h>
 
 #include "wc_inheritance.h"
 #include "wc_member.h"
@@ -25,12 +26,8 @@ template<class Class>
 class Callback
 {
 public:
-    static void Do(Class* x)
-    {
-    }
-    static void UnDo(Class* x)
-    {
-    }
+    static void Do(Class* x){}
+    static void UnDo(Class* x){}
 };
 
 /************************************************************************/
@@ -126,7 +123,7 @@ template <class C, size_t _offset, typename T>
 struct Responsible
 {
     static const size_t offset = _offset;
-    typedef T Type;
+    typedef T* Type;
     typedef C Base;
 
     static void Do(C* c)

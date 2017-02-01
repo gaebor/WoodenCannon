@@ -24,11 +24,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\wc_inheritance.h" />
+    <ClInclude Include="..\..\src\wc_list_gnuc.h" />
+    <ClInclude Include="..\..\src\wc_list_msc.h" />
     <ClInclude Include="..\..\src\wc_member.h" />
     <ClInclude Include="..\..\src\wc_network.h" />
     <ClInclude Include="..\..\src\wc_stl.h" />
     <ClInclude Include="..\..\src\wc.h" />
     <ClInclude Include="..\..\src\wc_core.h" />
+    <ClInclude Include="..\..\src\wc_vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D8F2C850-AD2C-43E6-86FD-2302BF77054D}</ProjectGuid>

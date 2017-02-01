@@ -4,9 +4,6 @@ LIBFLAGS=/nologo
 test: test_src/*.cpp lib
 	$(CPP) $(CPPFLAGS) /Fo"test_src/" test_src/*.cpp /link Ws2_32.lib wc.lib /OUT:$@.exe
 
-config.exe: src/config.cpp
-	$(CPP) $(CPPFLAGS) /Fo"src/" src/config.cpp /link /OUT:$@
-
 all: test config
 
 lib: wc.lib

@@ -12,11 +12,18 @@
 using namespace wc;
 
 template<typename T>
-void Test(T* t, const char* fname)
+void PrintLayout(const char* name)
+{
+    printf("%s", name);
+    Stitcher<T>::Custom([](void**x){printf(" %u", (size_t)x); }, nullptr);
+    printf(" %u", sizeof(T));
+}
+
+template<typename T>
+void Test(T* original, const char* fname)
 {
     try
     {
-        T reference;
         FILE* f = fopen(fname, "rb");
         if (f)
         {   // reads from file into buffer
@@ -25,36 +32,40 @@ void Test(T* t, const char* fname)
         }
         else
         {  // serializes
-            Serializer::Do(t);
+            Serializer::Do(original);
         }
 
-        Serializer::print_buffer();
+        PrintBuffer();
         std::cout << std::endl;
 
         auto buffer = *wc::GetBuffer();
 
         // de-serializes
-        Serializer::UnDo(&reference);
+        T* reconstructed = Serializer::UnDo<T>();
         // and then compare
-        if (!(reference == *t))
+        if (!(*reconstructed == *original))
         {
-            fprintf(stderr, "Failed!\n");
-            exit(1);
+            goto FAILED;
         }
         // if successful then write serialized object into file
         f = fopen(fname, "wb");
         if (f)
         {
-            fwrite(buffer.data(), sizeof(wc::BufferType::value_type), buffer.size(), f);
-            fclose(f);
-        }
-    // de-constructs reference
+            auto const written = fwrite(buffer.data(), sizeof(wc::BufferType::value_type), buffer.size(), f);
+            if (written != buffer.size() || fclose(f) == EOF)
+                goto FAILED;
+        }else
+            goto FAILED;
+        delete reconstructed;
     }
     catch (...)
     {
-        fprintf(stderr, "Failed!\n");
-        exit(1);
+        goto FAILED;
     }
+    return;
+FAILED:
+    fprintf(stderr, "Failed!\n");
+    exit(1);
 }
 
 int main(int argc, char* argv[])
@@ -93,33 +104,36 @@ int main(int argc, char* argv[])
     std::list<char> l = { 'A', '0', '#' };
     std::list<Add> l2(addons.begin(), addons.end());
 
-    printf("Z ");
+#define PRINT_LAYOUT(X) PrintLayout< X > ( #X )
+
+    const int const_test = argc;
+    PRINT_LAYOUT(const int);
+    Test(&const_test, "argc.bin");
+
+    PRINT_LAYOUT(Z);
     Test(&z, "Z.bin");
 
-    printf("Add ");
+    PRINT_LAYOUT(Add);
     Test(&add, "Add.bin");
 
-    printf("Mul ");
-    Test(&mul, "mul.bin");
+    PRINT_LAYOUT(Mul);
+    Test(&mul, "Mul.bin");
 
-    printf("ComplexChild ");
-    Test(&cc, "cc.bin");
+    PRINT_LAYOUT(ComplexChild);
+    Test(&cc, "ComplexChild.bin");
 
-    printf("Vector of Add ");
-    Test(&addons, "vector_add.bin");
-
-    printf("vector of vector ");
+    printf("vector_vector");
     Test(&m, "vector_vector.bin");
 
-    printf("list of char ");
-    Test(&l, "list.bin");
+    printf("list_char");
+    Test(&l, "list_char.bin");
 
-    printf("list of Add ");
-    Test(&l2, "list2.bin");
+    printf("list_Add");
+    Test(&l2, "list_Add.bin");
 
     l.clear();
-    printf("empty list ");
-    Test(&l, "list_empty.bin");
+    printf("empty_list");
+    Test(&l, "empty_list.bin");
 
     printf("Succeeded!\n");
     return 0;

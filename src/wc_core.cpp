@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "wc_network.h"
+
 namespace wc {
 
 static BufferType buffer; // TODO thread safe
@@ -15,7 +17,7 @@ static bool serialize = false; // TODO thread safe
 void Serializer::callback_one()
 {
     buffer.clear();
-    buffer.reserve(1 << 20); // TODO stitching
+    buffer.reserve(1 << 20); // just to be on the safe side
     serialize = true;
 }
 
@@ -29,9 +31,8 @@ const BufferType* GetBuffer()
     return &buffer;
 }
 
-void Serializer::print_buffer()
+void PrintBuffer()
 {
-    std::cout << buffer.size() << " bytes";
     for (size_t i = 0; i < buffer.size(); ++i)
     {
         if (i % sizeof(void*) == 0)
@@ -48,7 +49,7 @@ void Serializer::print_buffer()
     std::cout << std::endl;
 }
 
-void Serializer::set_max(size_t bytes)
+void SetMax(size_t bytes)
 {
     buffer.reserve(bytes);
 }
@@ -88,9 +89,7 @@ bool ReadBuffer(FILE* f, size_t s)
 
 void* operator new (size_t count, const std::nothrow_t& tag) throw()
 {
-    switch (wc::serialize)
-    {
-    case true:
+    if (wc::serialize)
     {
         const auto former_size = wc::buffer.size();
         const auto former_size_round = wc::RoundD<size_t, std::alignment_of<void*>::value>::Do(former_size);
@@ -104,11 +103,8 @@ void* operator new (size_t count, const std::nothrow_t& tag) throw()
         }
         wc::serialize = true;
         return wc::buffer.data() + former_size_round;
-    }break;
-    default:
+    }else
         return malloc(count);
-        break;
-    }        
 }
 
 void* operator new (size_t count)

@@ -1,7 +1,7 @@
 #ifndef INCLUDE_WC_NETWORK_H
 #define INCLUDE_WC_NETWORK_H
 
-#include "wc_core.h"
+#include <stddef.h>
 
 namespace wc
 {

@@ -54,7 +54,7 @@ namespace wc{
             if (v->empty())
             {   //hack!
                 auto const end = (void**)(v + 1);
-                Hacker::Do([&end](void** x){*x = end; }, v);
+                Hacker::Custom([&end](void** x){*x = end; }, v);
             }
             else
                 for (auto& m : *v)
@@ -64,10 +64,10 @@ namespace wc{
         {   //hack!
             auto const end = (void**)(v + 1);
             bool hacked = true;
-            Hacker::Do([&end, &hacked](void** x){hacked = hacked && (*x == end); }, v);
+            Hacker::Custom([&end, &hacked](void** x){hacked = hacked && (*x == end); }, v);
             if (hacked)
             {
-                Hacker::Do([&end](void** x){*x = nullptr; }, v);
+                Hacker::Custom([&end](void** x){*x = nullptr; }, v);
             }
             else
                 for (auto& m : *v)

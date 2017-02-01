@@ -1,7 +1,32 @@
 #ifndef INCLUDE_WC_MEMBER_H
 #define INCLUDE_WC_MEMBER_H
 
+#include "wc_functions.h"
+
 namespace wc{
+
+    template<class T> class Stitcher;
+
+    //! In general a member
+    /*!
+    @param C the owner of the member
+    @param _offset the position of the member inside the object
+    @param T the type of the member
+    */
+    template <class C, size_t _offset, typename T>
+    struct AbstractMember
+    {
+        static const size_t offset = _offset;
+        typedef T Type;
+        typedef C Base;
+
+        template<class F>
+        static void Custom(F f, C* c)
+        {
+            f((void**)((size_t)c + offset));
+        }
+    };
+
     //! this is for iterating over the members (compile time)
     template <class C, typename ...Arguments>
     struct Members
@@ -12,9 +37,10 @@ namespace wc{
         static void UnDo(C* x);
         //! you can call your function for the members in a for loop
         template<typename F>
-        static void Do(F f, C* x);
+        static void Custom(F f, C* x);
     };
 
+    //! iteratively calls Member::Do on argument list
     template <class C, class M, typename ...Arguments>
     struct Members<C, M, Arguments...>
     {
@@ -30,10 +56,10 @@ namespace wc{
             Members<C, Arguments...>::UnDo(x);
         }
         template<typename F>
-        static void Do(F f, C* x)
+        static void Custom(F f, C* x)
         {
-            f((void**)((char*)x + M::offset));
-            Members<C, Arguments...>::Do(f, x);
+            M::Custom(f, x);
+            Members<C, Arguments...>::Custom(f, x);
         }
     };
 
@@ -45,7 +71,7 @@ namespace wc{
         static void Do(C* x){}
         static void UnDo(C* x){}
         template<typename F>
-        static void Do(F f, C* x){}
+        static void Custom(F f, C* x){}
     };
 
     template<class C>
@@ -53,6 +79,83 @@ namespace wc{
     {
         //! by default, the class C has an empty member list
         typedef Members<C> List;
+    };
+
+    //! packs an ordinary member
+    template <class C, size_t _offset, typename T>
+    struct Member : public AbstractMember<C, _offset, T>
+    {
+        using AbstractMember<C, _offset, T>::offset;
+        static void Do(C* c)
+        {
+            Stitcher<T>::Do((T*)((size_t)c + offset));
+        }
+        static void UnDo(C* c)
+        {
+            Stitcher<T>::UnDo((T*)((size_t)c + offset));
+        }
+    };
+
+    //! a member pointer, which is not to be copied
+    template <class C, size_t _offset, typename T = void>
+    struct Pointer : public AbstractMember<C, _offset, T*>
+    {
+        using AbstractMember<C, _offset, T*>::offset;
+        static void Do(C* c)
+        {
+            memory2buffer((void**)((size_t)c + offset));
+        }
+        static void UnDo(C* c)
+        {
+            buffer2memory((void**)((size_t)c + offset));
+        }
+    };
+
+    //! a member pointer, the object is responsible for it
+    template <class C, size_t _offset, typename T>
+    struct Responsible : public AbstractMember<C, _offset, T*>
+    {
+        using AbstractMember<C, _offset, T*>::offset;
+        static void Do(C* c)
+        {
+            Stitcher<T>::Do(*(T**)((size_t)c + offset));
+            memory2buffer((void**)((size_t)c + offset));
+        }
+        static void UnDo(C* c)
+        {
+            buffer2memory((void**)((size_t)c + offset));
+            Stitcher<T>::UnDo(*(T**)((size_t)c + offset));
+        }
+    };
+
+    //! No way, man!
+    /*!
+    see http://stackoverflow.com/questions/9889488/can-we-make-a-class-copy-constructor-virtual-in-c
+    */
+    template <class C, size_t _offset, typename T>
+    struct Polymorphic
+    {
+    };
+
+    //! handy helper for brevity
+    template<class C>
+    struct MembersHelper
+    {
+        template<size_t _offset, typename T>
+        struct M
+        {
+            typedef Member<C, _offset, T> Type;
+        };
+        template<size_t _offset, typename T = void>
+        struct P
+        {
+            typedef Pointer<C, _offset, T> Type;
+        };
+        template<size_t _offset, typename T>
+        struct R
+        {
+            typedef Responsible<C, _offset, T> Type;
+        };
     };
 
 }

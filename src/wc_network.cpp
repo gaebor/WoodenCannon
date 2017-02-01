@@ -14,14 +14,8 @@
 namespace wc {
     void reorderbool(bool* x)
     {
-        switch (*((char*)x) == 0)
-        {
-        case false:
-            *((char*)x) = -1;
-            break;
-        default:
-            break;
-        }
+        if (*((char*)x) != 0) //0x00
+            *((char*)x) = -1; //0xFF
     }
     void deorderbool(bool* x)
     {

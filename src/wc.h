@@ -3,6 +3,7 @@
 
 #include "wc_core.h"
 #include "wc_stl.h"
+#include "wc_network.h"
 
 #ifdef WC_NETWORK
 
@@ -14,11 +15,11 @@ namespace wc{
     public:
         static void Do(Class* x)
         {
-            ByteReorder<sizeof(Class)>::Do(x);
+            ByteReorder<sizeof(Class)>::Do((void*)x);
         }
         static void UnDo(Class* x)
         {
-            ByteReorder<sizeof(Class)>::UnDo(x);
+            ByteReorder<sizeof(Class)>::UnDo((void*)x);
         }
     };
 

@@ -14,9 +14,14 @@ using namespace wc;
 template<typename T>
 void PrintLayout(const char* name)
 {
-    printf("%s", name);
-    Stitcher<T>::Custom([](void**x){printf(" %u", (size_t)x); }, nullptr);
-    printf(" %u", sizeof(T));
+    std::cout << name;
+    Stitcher<T>::Custom(
+        [](void**x)
+        {
+            std::cout << ' ' << (size_t)x;
+        }
+    , nullptr);
+    std::cout << ' ' << sizeof(T);
 }
 
 template<typename T>

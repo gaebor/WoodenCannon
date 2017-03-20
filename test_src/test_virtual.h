@@ -9,6 +9,8 @@ public:
     int a, b;
     virtual int Op() = 0;
     virtual bool operator==(const MyParentVirtual& other)const;
+    MyParentVirtual(){}
+    virtual ~MyParentVirtual(){}
 };
 
 namespace wc {
@@ -23,8 +25,10 @@ namespace wc {
 class Add : public MyParentVirtual
 {
 public:
+    Add(){}
     bool operator==(const Add& other)const;
-    virtual int Op();;
+    virtual int Op();
+    ~Add(){}
 };
 
 namespace wc {

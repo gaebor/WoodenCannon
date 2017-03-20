@@ -4,20 +4,22 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map>
 
 #include "wc_network.h"
 
+#include "wc_buffer.h"
+
 namespace wc {
 
-static BufferType buffer; // TODO thread safe
+static Buffer buffer; // TODO thread safe
 static std::bad_alloc nomem;
 
 static bool serialize = false; // TODO thread safe
 
 void Serializer::callback_one()
 {
-    buffer.clear();
-    buffer.reserve(1 << 20); // just to be on the safe side
+    buffer.Clear();
     serialize = true;
 }
 
@@ -28,30 +30,26 @@ void Serializer::callback_two()
 
 const BufferType* GetBuffer()
 {
-    return &buffer;
+    return buffer.ReArrange();
 }
 
 void PrintBuffer()
 {
-    for (size_t i = 0; i < buffer.size(); ++i)
+    auto& b = *buffer.ReArrange();
+    for (size_t i = 0; i < b.size(); ++i)
     {
         if (i % sizeof(void*) == 0)
         {
             std::cout.fill(' ');
-            auto ptr = *(std::ptrdiff_t*)(buffer.data() + i);
+            auto ptr = *(std::ptrdiff_t*)(b.data() + i);
             ByteReorder<sizeof(ptr)>::UnDo(&ptr);
             std::cout << "\n"; std::cout.width(4); std::cout << i <<
                 ".\t("; std::cout.width(20); std::cout << i + ptr << ")\t";
         }
         std::cout.fill('0'); std::cout.width(2);
-        std::cout << std::hex << (int)(buffer[i]) << std::dec;
+        std::cout << std::hex << (int)(b[i]) << std::dec;
     }
     std::cout << std::endl;
-}
-
-void SetMax(size_t bytes)
-{
-    buffer.reserve(bytes);
 }
 
 void memory2buffer(void** p)
@@ -70,7 +68,8 @@ void buffer2memory(void** p)
 
 bool WriteBuffer(FILE* f)
 {
-    return fwrite(buffer.data(), sizeof(BufferType::value_type), buffer.size(), f) == buffer.size();
+    auto& b = *buffer.ReArrange();
+    return fwrite(b.data(), sizeof(BufferType::value_type), b.size(), f) == b.size();
 }
 
 bool ReadBuffer(FILE* f, size_t s)
@@ -81,37 +80,43 @@ bool ReadBuffer(FILE* f, size_t s)
         s = ftell(f);
         fseek(f, 0, SEEK_SET);
     }
-    buffer.resize(s);
-    return fread(buffer.data(), sizeof(BufferType::value_type), s, f) == buffer.size();
+    buffer.Clear();
+    auto data = buffer.Allocate(s);
+    return fread(data, sizeof(BufferType::value_type), s, f) == sizeof(BufferType::value_type) * s;
 }
 
 }
 
 void* operator new (size_t count, const std::nothrow_t& tag) throw()
 {
-    if (wc::serialize)
-    {
-        const auto former_size = wc::buffer.size();
-        const auto former_size_round = wc::RoundD<size_t, std::alignment_of<void*>::value>::Do(former_size);
-        wc::serialize = false; // TODO write C-style buffer in order to eliminate further calls of operator-new!
-        try{
-            wc::buffer.resize(former_size_round + count);
-        }
-        catch (...)
-        {
-            return nullptr;
-        }
-        wc::serialize = true;
-        return wc::buffer.data() + former_size_round;
-    }else
-        return malloc(count);
+    try{
+        return operator new (count);
+    }
+    catch (std::bad_alloc&){
+        return nullptr;
+    }
 }
 
 void* operator new (size_t count)
 {
-    void * const p = ::operator new(count, std::nothrow);
-    if (!p)
-        throw wc::nomem;
+    if (wc::serialize)
+    {
+        const auto former_size = wc::buffer.GetSize();
+        const auto former_size_round = wc::RoundD<size_t, std::alignment_of<void*>::value>::Do(former_size);
+
+        wc::serialize = false; // TODO write C-style buffer in order to eliminate further calls of operator-new!
+        if (former_size_round != former_size)
+            wc::buffer.Allocate(former_size_round - former_size);
+        auto result = wc::buffer.Allocate(count);
+        wc::serialize = true;
+        return result;
+    }
     else
-        return p;
+    {
+        auto const ptr = malloc(count);
+        if (ptr)
+            return ptr;
+        else
+            throw wc::nomem;
+    }
 }

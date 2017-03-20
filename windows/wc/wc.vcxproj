@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\wc_buffer.cpp" />
     <ClCompile Include="..\..\src\wc_core.cpp" />
     <ClCompile Include="..\..\src\wc_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\wc_buffer.h" />
     <ClInclude Include="..\..\src\wc_functions.h" />
     <ClInclude Include="..\..\src\wc_inheritance.h" />
     <ClInclude Include="..\..\src\wc_list_gnuc.h" />

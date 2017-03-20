@@ -86,20 +86,28 @@ public:
         return GetBuffer();
     }
 
+    //! reconstructs an object from memory, in-place version
     template<class Class>
-    static void UnDo(Class* place) throw()
+    static void UnDo(Class* place, unsigned char* data) throw()
     {
         // this thing is a pointer to a broken object
-        auto thing = (Class*)(GetBuffer()->data());
+        auto thing = (Class*)data;
         // this is where it gets untangled (un-stitched)
         Stitcher<Class>::UnDo(thing);
         // calls a decent copy constructor, the buffer now contains a proper Class object
         new (place)Class(*thing);
     }
+    //! reconstructs an object from memory
+    /*!
+        @param data should hold the uncorrupted, serialized data.
+        The length of the data is not checked, user should guarantee that the whole object is there
+        The pointed array in the memory shall be modified during the process.
+        After the reconstruction one cannot reconstruct an other instance.
+    */
     template<class Class>
-    static Class* UnDo()
+    static Class* UnDo(unsigned char* data)
     {
-        auto thing = (Class*)(GetBuffer()->data());
+        auto thing = (Class*)data;
         Stitcher<Class>::UnDo(thing);
         return new Class(*thing);
     }

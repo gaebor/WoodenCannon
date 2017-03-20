@@ -9,6 +9,8 @@
 #include "complex_type.h"
 #include "responsible_member.h"
 
+#include <random>
+
 using namespace wc;
 
 template<typename T>
@@ -46,7 +48,7 @@ void Test(T* original, const char* fname)
         auto buffer = *wc::GetBuffer();
 
         // de-serializes
-        T* reconstructed = Serializer::UnDo<T>();
+        T* reconstructed = Serializer::UnDo<T>(BufferType(buffer).data());
         // and then compare
         if (!(*reconstructed == *original))
         {

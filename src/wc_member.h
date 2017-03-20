@@ -7,7 +7,7 @@ namespace wc{
 
     template<class T> class Stitcher;
 
-    //! In general a member
+    //! represents a member of a class in general
     /*!
     @param C the owner of the member
     @param _offset the position of the member inside the object

@@ -3,9 +3,19 @@
 
 #include "wc_core.h"
 #include "wc_stl.h"
-#include "wc_network.h"
 
 #ifdef WC_NETWORK
+
+#include "wc_network.h"
+
+/************************************************************************/
+/* You can make custom byte reorders here!                              */
+/*                                                                      */
+/* If your architecture has a custom data representation                */
+/* for which you would like to write a custom network reordering        */
+/* then simply override the StitcherProxy<Class, true> template.        */
+/* Like with the bool!                                                  */
+/************************************************************************/
 
 namespace wc{
 

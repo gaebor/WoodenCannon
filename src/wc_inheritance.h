@@ -54,7 +54,7 @@ namespace wc {
     template<class C>
     struct MyParents
     {
-        //! by default, the class C has an empty member list
+        //! by default, the class C has no parents
         typedef Parents<C> List;
     };
 }

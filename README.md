@@ -26,3 +26,9 @@ If any of the objects fail to reconstruct, then the fail is reported.
 
 If you run the `test` for the second time, it reads the serialized dump files and does the reconstruction from them.
 Again, if any of the objects fail to reconstruct, then the fail is reported.
+
+### `make all`
+* clears the dump files
+* clears all the binary code
+* compiles
+* runs the `test` twice

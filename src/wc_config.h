@@ -33,6 +33,7 @@
 #   define WC_COMPILER_VERSION WC_COMPILER_VERSION_F(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__)
 #else
 #   define WC_COMPILER_STR ""
+#   define WC_COMPILER_VERSION ""
 #endif //
 
 #define WC_CPP_VERSION(cpp) STRINGIZE(cpp)

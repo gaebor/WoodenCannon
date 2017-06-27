@@ -83,11 +83,9 @@ public:
     static const BufferType* Do(const Class* object)
     {
         callback_one();
-        // this is where the magic happens
-        auto serialized = new Class(*object);
-        callback_two();
-        // this is where the stitching happens, also magic
-        Stitcher<Class>::Do(serialized);
+        auto serialized = new Class(*object);   // this is where the magic happens
+        callback_two(); // also a bit magic
+        Stitcher<Class>::Do(serialized); // magic continues
         callback_three(); // this is less magic
         return GetBuffer();
     }

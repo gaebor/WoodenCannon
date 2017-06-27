@@ -28,10 +28,15 @@ namespace wc{
         */
         void* Allocate(size_t s);
         ~Buffer();
-        const BufferType* GetBin(void* p = nullptr)const;
         const BufferType* GetFirst()const;
         //! melts the blocks together
         void ReArrange();
+        //! determines the appropriate offset to move the pointer
+        /*!
+            takes the fragmented buffers into account
+        */
+        std::ptrdiff_t GetOffset(void** ptr)const;
+        void CalculateOffsets();
     private:
         BufferType* GetNew(size_t s = 0);
         bool IsAdjacentBuffer(BufferType* candidate)const;
@@ -48,8 +53,14 @@ namespace wc{
         typedef std::vector<BufferType*> HolderType;
         typedef std::map<BufferType::pointer, BufferType*> OrderedType;
         OrderedType ordered_;
+        typedef OrderedType::key_type keyptr;
         HolderType buffers_;
         OrderedType::const_iterator GetIterator(void* p)const;
+        std::unordered_map<keyptr, std::unordered_map<keyptr, std::ptrdiff_t>> offsets_;
+
+        //! determines which buffer is the pointed target in
+        keyptr GetBin(void* p)const;
+        std::ptrdiff_t GetOffset(void* place, void* target)const;
     };
 
 }

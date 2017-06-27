@@ -37,6 +37,7 @@ void Serializer::callback_one()
 void Serializer::callback_two()
 {
     serialize = false;
+    buffer.CalculateOffsets();
 }
 
 void Serializer::callback_three()
@@ -70,8 +71,7 @@ void PrintBuffer()
 
 void memory2buffer(void** p)
 {
-    //TODO take fragmented buffers into account
-    auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p;
+    auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p + buffer.GetOffset(p);
     *p = (void*)relative;
     StitcherProxy<void*, true>::Do(p);
 }

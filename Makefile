@@ -1,4 +1,4 @@
-CPPFLAGS=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Isrc -DWC_NETWORK -DWC_INITIAL_BUFFER_SIZE=1024 -O2
+CPPFLAGS=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -Isrc -DWC_NETWORK -O2
 CPP=g++
 AR=ar
 

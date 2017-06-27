@@ -34,6 +34,8 @@ namespace wc{
 
     void* Buffer::Allocate(size_t s)
     {
+        if (buffers_.empty())
+            return GetNew(s)->data();
         auto last = *(--buffers_.end());
         if (last->size() + s <= last->capacity())
         { // fits in the last buffer
@@ -70,7 +72,6 @@ namespace wc{
     void Buffer::Clear()
     {
         DestroyAll();
-        GetNew();
     }
 
     size_t Buffer::GetSize() const
@@ -121,6 +122,54 @@ namespace wc{
     size_t Buffer::GetBlockSize() const
     {
         return blockSize_;
+    }
+
+    std::ptrdiff_t Buffer::GetOffset(void* place, void* target) const
+    {
+        return offsets_.at(GetBin(place)).at(GetBin(target));
+    }
+
+    std::ptrdiff_t Buffer::GetOffset(void** ptr) const
+    {
+        return GetOffset(ptr, *ptr);
+    }
+
+    Buffer::keyptr Buffer::GetBin(void* p) const
+    {
+        if (ordered_.empty())
+            return nullptr;
+        auto const first = ordered_.begin()->first;
+        if (p < first)
+            return first;
+        return (--ordered_.upper_bound((OrderedType::key_type)p))->first;
+    }
+
+    void Buffer::CalculateOffsets()
+    {
+        offsets_.clear();
+        for (auto source = ordered_.begin(); source != ordered_.end(); ++source)
+        {
+            auto target = ordered_.begin();
+            for (; target != source; ++target)
+            {
+                std::ptrdiff_t result = 0;
+                auto next = target;
+                auto prev = target;
+                for (++next; prev != source; prev = next, ++next)
+                    result += next->second->data() - (prev->second->data() + prev->second->size());
+                offsets_[source->first][target->first] = result;
+            }
+            offsets_[source->first][target->first] = 0;
+            for (++target; target != ordered_.end(); ++target)
+            {
+                std::ptrdiff_t result = 0;
+                auto next = source;
+                auto prev = source;
+                for (++next; prev != target; prev = next, ++next)
+                    result -= next->second->data() - (prev->second->data() + prev->second->size());
+                offsets_[source->first][target->first] = result;
+            }
+        }
     }
 
 }

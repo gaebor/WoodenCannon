@@ -20,8 +20,16 @@ namespace wc {
     };
 
     //! translates pointers to relative pointers
+    /*!
+        this is where an other magic happens!
+        Also host to network reordering happens here, if configured.
+    */
     void memory2buffer(void** p);
     //! translates relative pointers to absolute pointers
+    /*!
+        this is where that magic is reversed!
+        Also network to host reordering happens here, if configured.
+    */
     void buffer2memory(void** p);
 
     typedef std::vector<unsigned char> BufferType;

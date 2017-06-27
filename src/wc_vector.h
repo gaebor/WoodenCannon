@@ -19,7 +19,7 @@ namespace wc{
             typename P<offsetof(container, _Myfirst)>::Type,
             typename P<offsetof(container, _Mylast) >::Type,
             typename P<offsetof(container, _Myend)  >::Type> List;
-#else
+#elif defined __GNUC__
         typedef std::_Vector_base<Ty, All> Base;
         typedef Members < container,
             Pointer<container, offsetof(Base, _M_impl._M_start)>,

@@ -1,3 +1,4 @@
+
 #include "wc_core.h"
 
 #include <stdlib.h>
@@ -10,12 +11,22 @@
 
 #include "wc_buffer.h"
 
+#if __cplusplus > 201100L
+#ifdef _MSC_VER
+#   define THREAD __declspec(thread)
+#else
+#   define THREAD thread_local
+#endif // _MSC_VER
+#else 
+#   define THREAD 
+#endif // __cplusplus > 201100L
+
 namespace wc {
 
-static Buffer buffer; // TODO thread safe
-static std::bad_alloc nomem;
+static THREAD Buffer buffer; // TODO thread safe, basically this is thread_local
+static THREAD bool serialize = false; // TODO thread safe
 
-static bool serialize = false; // TODO thread safe
+static std::bad_alloc nomem;
 
 void Serializer::callback_one()
 {
@@ -28,14 +39,19 @@ void Serializer::callback_two()
     serialize = false;
 }
 
+void Serializer::callback_three()
+{
+    buffer.ReArrange();
+}
+
 const BufferType* GetBuffer()
 {
-    return buffer.ReArrange();
+    return buffer.GetFirst();
 }
 
 void PrintBuffer()
 {
-    auto& b = *buffer.ReArrange();
+    auto& b = *GetBuffer();
     for (size_t i = 0; i < b.size(); ++i)
     {
         if (i % sizeof(void*) == 0)
@@ -54,21 +70,22 @@ void PrintBuffer()
 
 void memory2buffer(void** p)
 {
+    //TODO take fragmented buffers into account
     auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p;
     *p = (void*)relative;
-    ByteReorder<sizeof(void*)>::Do(p);
+    StitcherProxy<void*, true>::Do(p);
 }
 
 void buffer2memory(void** p)
 {
-    ByteReorder<sizeof(void*)>::UnDo(p);
+    StitcherProxy<void*, true>::UnDo(p);
     auto const absolute = (std::ptrdiff_t)(*p) + (std::ptrdiff_t)p;
     *p = (void*)absolute;
 }
 
 bool WriteBuffer(FILE* f)
 {
-    auto& b = *buffer.ReArrange();
+    auto& b = *GetBuffer();
     return fwrite(b.data(), sizeof(BufferType::value_type), b.size(), f) == b.size();
 }
 
@@ -84,6 +101,12 @@ bool ReadBuffer(FILE* f, size_t s)
     auto data = buffer.Allocate(s);
     return fread(data, sizeof(BufferType::value_type), s, f) == sizeof(BufferType::value_type) * s;
 }
+
+const char* get_compile_info()
+{
+    return WC_COMPILER_STR;
+}
+
 
 }
 

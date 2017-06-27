@@ -77,6 +77,8 @@ FAILED:
 
 int main(int argc, char* argv[])
 {
+    std::cerr << wc::get_compile_info() << std::endl;
+
     Add add; Mul mul;
     Z z; ComplexChild cc;
 

@@ -1,10 +1,11 @@
+#include "wc_config.h"
 #include "wc_buffer.h"
 
 #include <algorithm>
 
 namespace wc{
 
-    Buffer::Buffer() : _blockSize(1024), _size(0), _ordered()
+    Buffer::Buffer() : blockSize_(WC_INITIAL_BUFFER_SIZE), size_(0), ordered_()
     {
         GetNew();
     }
@@ -16,62 +17,54 @@ namespace wc{
 
     BufferType* Buffer::GetNew(size_t s)
     {
-        auto buffer = new BufferType();
-        while (_blockSize < s) _blockSize *= 2;
-        buffer->reserve(_blockSize);
-        buffer->resize(s);
-        _size += s;
-        _ordered[buffer->data()] = buffer;
-        //std::unordered_map<void*, intptr_t> row;
-        //row[buffer] = 0;
-        //for (auto& g : gaps)
-        //{
-        //    g.second[] = ;
-        //    row[] ;
-        //}
-        //gaps[buffer] = row;
-        return buffer;
+        // OrderedType::const_iterator adjacent;
+        while (blockSize_ < s)
+            blockSize_ *= 2;
+        BufferType* new_buffer = nullptr;
+        do {
+            // this may be an infinite loop !!!
+            delete new_buffer;
+            new_buffer = new BufferType();
+            new_buffer->reserve(blockSize_);
+        } while (IsAdjacentBuffer(new_buffer));
+        new_buffer->resize(s);
+        InsertNew(new_buffer);
+        return new_buffer;
     }
 
     void* Buffer::Allocate(size_t s)
     {
-        auto last = (--_ordered.end())->second;
+        auto last = *(--buffers_.end());
         if (last->size() + s <= last->capacity())
-        {
+        { // fits in the last buffer
             auto end = last->data() + last->size();
             last->resize(last->size() + s); // no reallocation
-            _size += s;
+            size_ += s;
             return end;
-        }else
-        {
+        }else // a new one is needed
             return GetNew(s)->data();
-        }
     }
 
-    BufferType* Buffer::ReArrange()
+    void Buffer::ReArrange()
     {
-        if (_ordered.size() > 1)
+        if (ordered_.size() > 1)
         {
             auto buffer = new BufferType();
-            for (auto& b : _ordered)
-                buffer->insert(buffer->end(), b.second->begin(), b.second->end());
-            _blockSize = buffer->capacity();
+            for (auto& b : buffers_)
+                buffer->insert(buffer->end(), b->begin(), b->end());
+            blockSize_ = buffer->capacity();
             DestroyAll();
-            _ordered[buffer->data()] = buffer;
-            return buffer;
-        }else
-        {
-            return _ordered.begin()->second;
+            InsertNew(buffer);
         }
     }
 
     void Buffer::DestroyAll()
     {
-        for (auto& b : _ordered)
+        for (auto& b : ordered_)
             delete b.second;
-        _ordered.clear();
-        _size = 0;
-        // gaps.clear();
+        ordered_.clear();
+        buffers_.clear();
+        size_ = 0;
     }
 
     void Buffer::Clear()
@@ -82,12 +75,52 @@ namespace wc{
 
     size_t Buffer::GetSize() const
     {
-        return _size;
+        return size_;
     }
 
-    void* Buffer::GetBin(void* p) const
+    //BufferType* Buffer::GetBin(void* p) const
+    //{
+    //    return GetIterator(p)->second;
+    //}
+
+    //Buffer::OrderedType::const_iterator Buffer::GetIterator(void* p) const
+    //{
+    //    //return --(ordered_.upper_bound((void**)p));
+    //    return ordered_.end();
+    //}
+
+    void Buffer::InsertNew(BufferType* new_buffer)
     {
-        return (--_ordered.upper_bound(p))->first;
+        buffers_.push_back(new_buffer);
+        ordered_[new_buffer->data()] = new_buffer;
+        size_ += new_buffer->size();
+    }
+
+    bool Buffer::IsAdjacentBuffer(BufferType* candidate) const
+    {
+        if (ordered_.size() == 0)
+            return false; // no blocks so far
+        if (candidate->data() + candidate->size() < ordered_.begin()->first)
+            return false; // before the first
+        auto last = (--ordered_.end())->second;
+        if (candidate->data() > last->data() + last->size())
+            return false; // after the last
+        auto before = (--ordered_.upper_bound(candidate->data()))->second;
+        auto after = before;
+        ++after;
+        return
+            before->data() + before->size() < candidate->data() && 
+            candidate->data() < after->data();
+    }
+
+    const BufferType* Buffer::GetFirst() const
+    {
+            return buffers_[0];
+    }
+
+    size_t Buffer::GetBlockSize() const
+    {
+        return blockSize_;
     }
 
 }

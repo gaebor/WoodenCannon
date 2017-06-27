@@ -8,24 +8,48 @@
 
 namespace wc{
 
+    //! internal storage of blocks of memory
+    /*!
+        This is not seen for the user if the library
+    */
     class Buffer
     {
     public:
+        //! starts a new page
         void Clear();
         Buffer();
+        //! Get the number of held bytes
         size_t GetSize()const;
-        BufferType* ReArrange();
-        //! this may throw
+        //! Get the block size
+        size_t GetBlockSize()const;
+        //! allocates given bytes into internal buffer(s)
+        /*!
+            this may throw
+        */
         void* Allocate(size_t s);
         ~Buffer();
-        void* GetBin(void* p)const;
+        const BufferType* GetBin(void* p = nullptr)const;
+        const BufferType* GetFirst()const;
+        //! melts the blocks together
+        void ReArrange();
     private:
         BufferType* GetNew(size_t s = 0);
+        bool IsAdjacentBuffer(BufferType* candidate)const;
+        void InsertNew(BufferType* new_buffer);
         void DestroyAll();
-        size_t _blockSize;
-        size_t _size;
-        std::map<void*, BufferType*> _ordered;
-        // std::unordered_map<void**, std::unordered_map<void*, intptr_t>> gaps;
+        //! the allocation size of a new memory block
+        /*!
+            Fragmented allocation may occur if it is small,
+            But it expands according to usage.
+        */
+        size_t blockSize_;
+        //! number of held bytes
+        size_t size_;
+        typedef std::vector<BufferType*> HolderType;
+        typedef std::map<BufferType::pointer, BufferType*> OrderedType;
+        OrderedType ordered_;
+        HolderType buffers_;
+        OrderedType::const_iterator GetIterator(void* p)const;
     };
 
 }

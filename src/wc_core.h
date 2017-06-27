@@ -3,10 +3,14 @@
 
 #include <type_traits>
 
+#include "wc_config.h"
+
 #include "wc_inheritance.h"
 #include "wc_member.h"
 
 namespace wc {
+
+const char* get_compile_info();
 
 #define WC_ERROR_MESSAGE1 "This object is not trivially copyable, please override its serialization method. See http://www.cplusplus.com/reference/type_traits/is_trivially_copyable/"
 
@@ -68,6 +72,7 @@ class Serializer
 private:
     static void callback_one();
     static void callback_two();
+    static void callback_three();
 public:
     //! Serializes a given object
     /*!
@@ -81,8 +86,9 @@ public:
         // this is where the magic happens
         auto serialized = new Class(*object);
         callback_two();
-        // this is where the stitching happens
+        // this is where the stitching happens, also magic
         Stitcher<Class>::Do(serialized);
+        callback_three(); // this is less magic
         return GetBuffer();
     }
 

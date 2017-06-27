@@ -3,6 +3,22 @@
 #   define WC_INITIAL_BUFFER_SIZE 16
 #endif // !WC_INITIAL_BUFFER_SIZE
 
+#ifdef WC_NETWORK
+#   define WC_BYTE_ORDER "network"
+#elif defined _WIN32
+#   define WC_BYTE_ORDER "little"
+#elif defined __BYTE_ORDER__
+#   if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#       define WC_BYTE_ORDER "little"
+#   elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#       define WC_BYTE_ORDER "big"
+#   elif __BYTE_ORDER__ == __ORDER_PDP_ENDIAN__
+#       define WC_BYTE_ORDER "PDP"
+#   endif
+#else
+#   define WC_BYTE_ORDER "unknown"
+#endif
+
 #ifdef _WIN64
 #define WC_BIT_MODEL "LLP64"
 #endif //  _WIN64
@@ -38,4 +54,4 @@
 
 #define WC_CPP_VERSION(cpp) STRINGIZE(cpp)
 
-#define WC_COMPILER_STR WC_BIT_MODEL "_" WC_COMPILER_TYPE "_" WC_COMPILER_VERSION "_cpp" WC_CPP_VERSION(__cplusplus)
+#define WC_COMPILER_STR WC_BIT_MODEL "_" WC_BYTE_ORDER "-endian_" WC_COMPILER_TYPE "_" WC_COMPILER_VERSION "_cpp" WC_CPP_VERSION(__cplusplus)

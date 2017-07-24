@@ -15,7 +15,7 @@ Tale about the wooden cannon of [Tihany](https://en.wikipedia.org/wiki/Tihany)
  * There is a Visual Studio solution under `windows/windows.sln`
 
 ## Usage
- * include `src/wc.h`
+ * include `inc/wc.h` (and other headers in `inc/`)
  * link against the static library `wc`
  * see the `test` executable for example usage
 

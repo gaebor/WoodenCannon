@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\stl">
+      <UniqueIdentifier>{6cd6fb9e-a7e1-412f-bf85-bd8bff33c52d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stl\list">
+      <UniqueIdentifier>{12616ebc-0d9d-4107-a381-a707acea5162}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stl\vector">
+      <UniqueIdentifier>{76df835a-1107-4fd8-b0b0-73089b6c4871}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\wc_core.cpp">
@@ -44,15 +53,6 @@
     <ClInclude Include="..\..\src\wc_network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_list_gnuc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_list_msc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\wc_functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -61,6 +61,24 @@
     </ClInclude>
     <ClInclude Include="..\..\src\wc_config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wc_list_msc_1800.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wc_list_msc_1910.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wc_list.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wc_vector.h">
+      <Filter>Header Files\stl\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wc_vector_msc_1800.h">
+      <Filter>Header Files\stl\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wc_vector_msc_1910.h">
+      <Filter>Header Files\stl\vector</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

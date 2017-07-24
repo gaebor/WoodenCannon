@@ -1,21 +1,32 @@
-CPPFLAGS=/EHsc /MT /Ot /Ox /nologo /Isrc /D"WC_NETWORK"
+CPPFLAGS=/EHsc /MT /Ot /Ox /nologo /Isrc /DWC_NETWORK
 LIBFLAGS=/nologo
 
-test: test_src/*.cpp lib
-	$(CPP) $(CPPFLAGS) /Fo"test_src/" test_src/*.cpp /link Ws2_32.lib wc.lib /OUT:$@.exe
+test_sources=test_src\*.cpp
+test_objects=$(test_sources:cpp=obj)
 
-do_test: clean test
+test: test.exe
+
+test.exe: lib $(test_objects)
+	$(CPP) $(CPPFLAGS) $(test_objects) /link Ws2_32.lib wc.lib /OUT:$@
+
+run: test
 	test.exe && test.exe
 
-all: do_test
+{test_src\}.cpp{test_src\}.obj::
+	cl /c $(CPPFLAGS) /Fo"test_src/" $<
+
+{src\}.cpp{src\}.obj::
+	cl /c $(CPPFLAGS) /Fo"src/" $<
+    
+all: clean run
 
 lib: wc.lib
 
-wc.lib: src/wc_core.obj
-	lib $(LIBFLAGS) /OUT:$@ src/*.obj
+wc.lib: src/wc_core.obj src/wc_network.obj src/wc_buffer.obj
+	lib $(LIBFLAGS) /OUT:$@ $**
 
-src/wc_core.obj:src/wc_core.cpp
-	cl $(CPPFLAGS) /Fo"src/" /c src/*.cpp
-
-clean:
-	del /Q *.lib *.exe src\*.obj test_src\*.obj *.bin
+clean_bin:
+	del /Q *.bin
+    
+clean: clean_bin
+	del /Q *.lib *.exe src\*.obj test_src\*.obj

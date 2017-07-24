@@ -2,7 +2,29 @@
 #define INCLUDE_WC_H
 
 #include "wc_core.h"
-#include "wc_stl.h"
+
+namespace wc{
+    template<class C>
+    class ResponsiblePtr
+    {
+    protected:
+        C* ptr_;
+        friend MembersOf<ResponsiblePtr<C>>;
+    public:
+        ResponsiblePtr(C* ptr = nullptr) : ptr_(ptr){}
+        ResponsiblePtr(const ResponsiblePtr& other) : ptr_(new C(*other.ptr_)){}
+        bool operator==(const ResponsiblePtr& other)const{return *ptr_ == *other.ptr_;}
+        C* operator->(){return ptr_;}
+        const C* operator->() const { return ptr_; }
+    };
+
+    template<class C>
+    class MembersOf<ResponsiblePtr<C>> : public 
+        Responsible<ResponsiblePtr<C>, 0, C>
+    {
+    };
+
+}
 
 #ifdef WC_NETWORK
 
@@ -19,7 +41,7 @@
 
 namespace wc{
 
-    template<class Class>
+    template<typename Class>
     class StitcherProxy<Class, true>
     {
     public:

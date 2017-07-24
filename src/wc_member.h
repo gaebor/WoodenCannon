@@ -19,11 +19,11 @@ namespace wc{
         static const size_t offset = _offset;
         typedef T Type;
         typedef C Base;
-
         template<class F>
         static void Custom(F f, C* c)
         {
-            f((void**)((size_t)c + offset));
+            f((size_t)c + offset);
+            Stitcher<T>::Custom(f, (T*)((size_t)c + offset));
         }
     };
 
@@ -74,11 +74,10 @@ namespace wc{
         static void Custom(F f, C* x){}
     };
 
+    //! by default, the class C has an empty member list
     template<class C>
-    struct MyMembers
+    struct MembersOf: public Members<C>
     {
-        //! by default, the class C has an empty member list
-        typedef Members<C> List;
     };
 
     //! packs an ordinary member
@@ -126,6 +125,12 @@ namespace wc{
             buffer2memory((void**)((size_t)c + offset));
             Stitcher<T>::UnDo(*(T**)((size_t)c + offset));
         }
+        template<class F>
+        static void Custom(F f, C* c)
+        {
+            f((size_t)c + offset);
+            Stitcher<T>::Custom(f, *(T**)((size_t)c + offset));
+        }
     };
 
     //! No way, man!
@@ -141,6 +146,13 @@ namespace wc{
     template<class C>
     struct MembersHelper
     {
+        template<class T C::*member>
+        struct m
+        {
+            static const size_t offset = ((size_t)&reinterpret_cast<char const volatile&>((((C*)nullptr)->*member)));
+            typedef Member<C, offset, T> Type;
+        };
+
         template<size_t _offset, typename T>
         struct M
         {

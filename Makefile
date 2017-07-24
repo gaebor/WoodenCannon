@@ -1,4 +1,4 @@
-CPPFLAGS=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Isrc -DWC_NETWORK -O2
+CPPFLAGS+=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Isrc -DWC_NETWORK -O2
 CPP=g++
 AR=ar
 
@@ -11,22 +11,24 @@ TRGT_OBJS=$(TRGT_SRCS:cpp=o)
 test: lib $(TEST_OBJS)
 	$(CPP) -L. $(TEST_OBJS) -lwc -o $@
 
-do_test: clean test
+run: test
 	./test && ./test
 
 test_src/%.o :: test_src/%.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
+
 src/%.o :: src/%.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
-.o :: .cpp
-	$(CPP) $(CPPFLAGS) $< -o $@
 
-all: do_test
+all: clean run
 
 lib: libwc.a
 
 libwc.a: $(TRGT_OBJS)
 	$(AR) rcs $@ $(TRGT_OBJS)
 
-clean:
-	rm -f test_src/*.o src/*.o *.a test *.bin
+clean_bin:
+	rm -f *.bin
+
+clean: clean_bin
+	rm -f test_src/*.o src/*.o *.a test

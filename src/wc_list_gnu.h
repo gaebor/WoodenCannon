@@ -1,36 +1,26 @@
-#ifndef WC_LIST_GNUC_H
-#define WC_LIST_GNUC_H
-
-#include "wc_core.h"
-#include <list>
-
 namespace wc
 {
     typedef std::__detail::_List_node_base nodebase;
 
     template<>
-    struct MyMembers<nodebase> : MembersHelper<nodebase>
-    {
-        typedef Members<nodebase,
+    struct MembersOf<nodebase> :
+        Members<nodebase,
             Pointer<nodebase, offsetof(nodebase, _M_next)>,
             Pointer<nodebase, offsetof(nodebase, _M_prev)>
-        > List;
-    };
+        >
+    {};
 
     template<class Type>
-    struct MyMembers<std::_List_node<Type>> : MembersHelper<std::_List_node<Type>>
-    {
-        typedef std::_List_node<Type> Self;
-        typedef Members<Self, 
-            Member<Self, offsetof(Self, _M_data), Type>
-        > List;
-    };
+    struct MembersOf<std::_List_node<Type>> :
+        Members<std::_List_node<Type>,
+            Member<std::_List_node<Type>, offsetof(std::_List_node<Type>, _M_data), Type>
+        >
+    {};
 
     template<class Type>
-    struct MyParents<std::_List_node<Type>>
-    {
-        typedef Parents<std::_List_node<Type>, nodebase> List;
-    };
+    struct ParentsOf<std::_List_node<Type>> :
+        Parents<std::_List_node<Type>, nodebase>
+    {};
 
     template <class Ty, class All>
     struct Callback<std::list<Ty, All>> : std::list<Ty, All>
@@ -64,5 +54,3 @@ namespace wc
     };
 
 }
-
-#endif //WC_LIST_GNUC_H

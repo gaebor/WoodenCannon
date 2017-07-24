@@ -15,13 +15,12 @@ public:
 
 namespace wc {
     template<>
-    struct MyMembers<MyParentVirtual> : MembersHelper<MyParentVirtual>
-    {
-        typedef Members<MyParentVirtual,
-        M<offsetof(MyParentVirtual, a), int>::Type,
-        M<offsetof(MyParentVirtual, b), int>::Type> List;
-    };
+    struct MembersOf<MyParentVirtual> : Members<MyParentVirtual,
+        Member<MyParentVirtual, offsetof(MyParentVirtual, a), int>,
+        Member<MyParentVirtual, offsetof(MyParentVirtual, b), int>>
+    {};
 }
+
 class Add : public MyParentVirtual
 {
 public:
@@ -33,10 +32,8 @@ public:
 
 namespace wc {
     template<>
-    struct MyParents<Add>
-    {
-        typedef Parents<Add, MyParentVirtual> List;
-    };
+    struct ParentsOf<Add> : Parents<Add, MyParentVirtual>
+    {};
 }
 
 class Zero : public Add

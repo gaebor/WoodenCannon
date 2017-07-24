@@ -1,7 +1,7 @@
-#ifndef INCLUDE_WC_VECTOR_H
-#define INCLUDE_WC_VECTOR_H
+#ifndef  INCLUDE_WC_LIST_H
+#define INCLUDE_WC_LIST_H
 
-#include <vector>
+#include <list>
 
 #include "wc_core.h"
 
@@ -10,9 +10,10 @@
 #define wc_header(PREFIX, VERSION) _wc_header(PREFIX, VERSION)
 
 #ifdef _MSC_VER
-#include wc_header(wc_vector_msc_, _MSC_VER)
+#include wc_header(wc_list_msc_, _MSC_VER)
 #elif defined __GNUC__
-#   include "wc_vector_gnu.h"
+#   include "wc_list_gnu.h"
 #endif
 
 #endif
+

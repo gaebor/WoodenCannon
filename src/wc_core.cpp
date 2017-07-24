@@ -2,13 +2,12 @@
 #include "wc_core.h"
 
 #include <stdlib.h>
-
+#include <cstddef>
 #include <algorithm>
 #include <iostream>
 #include <map>
 
 #include "wc_network.h"
-
 #include "wc_buffer.h"
 
 #if __cplusplus > 201100L
@@ -60,8 +59,9 @@ void PrintBuffer()
             std::cout.fill(' ');
             auto ptr = *(std::ptrdiff_t*)(b.data() + i);
             ByteReorder<sizeof(ptr)>::UnDo(&ptr);
+            ptr += i;
             std::cout << "\n"; std::cout.width(4); std::cout << i <<
-                ".\t("; std::cout.width(20); std::cout << i + ptr << ")\t";
+                ".\t("; std::cout.width(20); std::cout << ptr << ")\t";
         }
         std::cout.fill('0'); std::cout.width(2);
         std::cout << std::hex << (int)(b[i]) << std::dec;
@@ -73,12 +73,12 @@ void memory2buffer(void** p)
 {
     auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p + buffer.GetOffset(p);
     *p = (void*)relative;
-    StitcherProxy<void*, true>::Do(p);
+    ByteReorder<sizeof(void*)>::Do(p);
 }
 
 void buffer2memory(void** p)
 {
-    StitcherProxy<void*, true>::UnDo(p);
+    ByteReorder<sizeof(void*)>::UnDo(p);
     auto const absolute = (std::ptrdiff_t)(*p) + (std::ptrdiff_t)p;
     *p = (void*)absolute;
 }
@@ -115,19 +115,28 @@ void* operator new (size_t count, const std::nothrow_t& tag) throw()
     try{
         return operator new (count);
     }
-    catch (std::bad_alloc&){
+    catch (std::exception&){
         return nullptr;
     }
 }
+
+#if __GNUC__ == 4 && (__GNUC_MINOR__ < 9)
+// see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56019
+#define max_align_t_namespace 
+#else 
+#define max_align_t_namespace std
+#endif
+
+typedef wc::RoundD<size_t, alignof(max_align_t_namespace::max_align_t)> rounder;
 
 void* operator new (size_t count)
 {
     if (wc::serialize)
     {
         const auto former_size = wc::buffer.GetSize();
-        const auto former_size_round = wc::RoundD<size_t, std::alignment_of<void*>::value>::Do(former_size);
+        const auto former_size_round = rounder::Do(former_size);
 
-        wc::serialize = false; // TODO write C-style buffer in order to eliminate further calls of operator-new!
+        wc::serialize = false;
         if (former_size_round != former_size)
             wc::buffer.Allocate(former_size_round - former_size);
         auto result = wc::buffer.Allocate(count);

@@ -30,29 +30,31 @@ public:
 namespace wc{
     //! defines the (one and only) member of ComplexParent
     template<>
-    struct MyMembers<ComplexParent> : public MembersHelper<ComplexParent>
-    {
-        typedef Members<ComplexParent, M<offsetof(ComplexParent, v), std::vector<int>>::Type> List;
-    };
+    struct MembersOf<ComplexParent> :
+        Members<ComplexParent,
+            Member<ComplexParent, offsetof(ComplexParent, v), std::vector<int>>
+        >
+    {};
 
     template<>
-    struct MyMembers<ComplexParent2>
-    {
-        typedef Members<ComplexParent2, Member<ComplexParent2, offsetof(ComplexParent2, w), std::vector<int>>> List;
-    };
+    struct MembersOf<ComplexParent2> : 
+        Members<ComplexParent2,
+            Member<ComplexParent2, offsetof(ComplexParent2, w), std::vector<int>>
+        >
+    {};
 
     template<>
-    struct MyMembers<ComplexChild> : public MembersHelper<ComplexChild>
-    {
-        typedef Members<ComplexChild, M<offsetof(ComplexChild, vv), std::vector<int>>::Type> List;
-    };
+    struct MembersOf<ComplexChild> :
+        Members<ComplexChild,
+            Member<ComplexChild, offsetof(ComplexChild, vv), std::vector<int>>
+        >
+    {};
 
     //! defines the relation between ComplexChild and ComplexParent
     template<>
-    struct MyParents<ComplexChild>
-    {
-        typedef Parents<ComplexChild, ComplexParent, ComplexParent2> List;
-    };
+    struct ParentsOf<ComplexChild> : 
+        Parents<ComplexChild, ComplexParent, ComplexParent2>
+    {};
 }
 
 #endif //INCLUDE_COMPLEX_TYPE_H

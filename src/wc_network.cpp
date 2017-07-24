@@ -14,14 +14,11 @@
 namespace wc {
     void reorderbool(bool* x)
     {
-        if (*((char*)x) != 0) //0x00
-            *((char*)x) = -1; //0xFF
+        *((unsigned char*)x) = x ? 0xff : 0;
     }
     void deorderbool(bool* x)
     {
-        // I hope this is how they define it
-        // although it is totally compiler dependent
-        *x = (*((char*)x) != 0);
+        *x = (*((unsigned char*)x) >= 0);
     }
 
     void reorder2(void* x)

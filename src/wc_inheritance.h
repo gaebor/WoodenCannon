@@ -51,11 +51,10 @@ namespace wc {
         static void UnDo(C* x){}
     };
 
+    //! by default, the class C has no parents
     template<class C>
-    struct MyParents
+    struct ParentsOf : public Parents<C>
     {
-        //! by default, the class C has no parents
-        typedef Parents<C> List;
     };
 }
 

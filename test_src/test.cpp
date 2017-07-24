@@ -4,25 +4,25 @@
 #include <list>
 #include <stddef.h>
 
+#include "wc.h"
+
+#ifdef __GNUC__
+#include "wc_stl.h"
+#endif 
+
 #include "test_virtual.h"
 #include "c_style_class.h"
 #include "complex_type.h"
 #include "responsible_member.h"
-
-#include <random>
-
-using namespace wc;
+#include "MyClasses.h"
 
 template<typename T>
-void PrintLayout(const char* name)
+void PrintLayout(const char* name, T* t = nullptr)
 {
     std::cout << name;
-    Stitcher<T>::Custom(
-        [](void**x)
-        {
-            std::cout << ' ' << (size_t)x;
-        }
-    , nullptr);
+    wc::Stitcher<T>::Custom(
+        [](size_t x){ std::cout << ' ' << x; }
+    , t);
     std::cout << ' ' << sizeof(T);
 }
 
@@ -34,21 +34,21 @@ void Test(T* original, const char* fname)
         FILE* f = fopen(fname, "rb");
         if (f)
         {   // reads from file into buffer
-            ReadBuffer(f);
+            wc::ReadBuffer(f);
             fclose(f);
         }
         else
         {  // serializes
-            Serializer::Do(original);
+            wc::Serializer::Do(original);
         }
 
-        PrintBuffer();
+        wc::PrintBuffer();
         std::cout << std::endl;
 
         auto buffer = *wc::GetBuffer();
 
         // de-serializes
-        T* reconstructed = Serializer::UnDo<T>(BufferType(buffer).data());
+        T* reconstructed = wc::Serializer::UnDo<T>(wc::BufferType(buffer).data());
         // and then compare
         if (!(*reconstructed == *original))
         {
@@ -115,9 +115,11 @@ int main(int argc, char* argv[])
 
 #define PRINT_LAYOUT(X) PrintLayout< X > ( #X )
 
+    {
     const int const_test = argc;
     PRINT_LAYOUT(const int);
     Test(&const_test, "argc.bin");
+    }
 
     PRINT_LAYOUT(Z);
     Test(&z, "Z.bin");
@@ -128,8 +130,38 @@ int main(int argc, char* argv[])
     PRINT_LAYOUT(Mul);
     Test(&mul, "Mul.bin");
 
+    {
+        ClassWithPtr cp(10);
+        PrintLayout("ClassWithPtr", &cp);
+        Test(&cp, "class_ptr.bin");
+    }
+
     PRINT_LAYOUT(ComplexChild);
     Test(&cc, "ComplexChild.bin");
+
+    {
+    std::vector<MyParent> vs;
+    vs.emplace_back(); vs.back().a = 1;
+    vs.emplace_back(); vs.back().a = 2;
+    PrintLayout<decltype(vs)>("vector_simple");
+    Test(&vs, "vector_simple.bin");
+    }
+
+    {
+    std::vector<Odd> vo;
+    vo.emplace_back(); vo.back().a = 1;
+    vo.emplace_back(); vo.back().a = 2;
+    printf("vector_odd");
+    Test(&vo, "vector_odd.bin");
+    }
+
+    {
+        std::vector<wc::ResponsiblePtr<Odd>> vp;
+        printf("vector<responsible>");
+        vp.emplace_back(new Odd()); vp.back()->a = 1;
+        vp.emplace_back(new Odd()); vp.back()->a = 2;
+        Test(&vp, "vector_ptr.bin");
+    }
 
     printf("vector_vector");
     Test(&m, "vector_vector.bin");

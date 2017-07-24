@@ -2,11 +2,15 @@
 #define INCLUDE_WC_CORE_H
 
 #include <type_traits>
+#include <stddef.h>
 
 #include "wc_config.h"
 
 #include "wc_inheritance.h"
 #include "wc_member.h"
+
+#define WC_QUOTE(name) #name
+#define WC_STRINGIZE(macro) WC_QUOTE(macro)
 
 namespace wc {
 
@@ -36,13 +40,13 @@ public:
     static void Do(Class* x)
     {
         Callback<Class>::Do(x);
-        MyParents<Class>::List::Do(x);
-        MyMembers<Class>::List::Do(x);
+        ParentsOf<Class>::Do(x);
+        MembersOf<Class>::Do(x);
     }
     static void UnDo(Class* x)
     {
-        MyMembers<Class>::List::UnDo(x);
-        MyParents<Class>::List::UnDo(x);
+        MembersOf<Class>::UnDo(x);
+        ParentsOf<Class>::UnDo(x);
         Callback<Class>::UnDo(x);
     }
 };
@@ -54,8 +58,8 @@ public:
     template<class F>
     static void Custom(F f, Class* x)
     {
-        MyParents<Class>::List::Custom(f, x);
-        MyMembers<Class>::List::Custom(f, x);
+        ParentsOf<Class>::Custom(f, x);
+        MembersOf<Class>::Custom(f, x);
     }
     static void Do(Class* x)
     {

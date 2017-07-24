@@ -1,15 +1,13 @@
 #ifndef INCLUDE_WC_LIST_MSC
 #define INCLUDE_WC_LIST_MSC
 
-#include "wc_core.h"
-
 #include <list>
 #include <type_traits>
 
 namespace wc{
 
     template <class Ty, class All>
-    struct MyMembers<std::list<Ty, All>> : MembersHelper<std::list<Ty, All>>
+    struct MembersOf<std::list<Ty, All>> : MembersHelper<std::list<Ty, All>>
     {
         typedef std::list<Ty, All> container;
         typedef typename container::_Nodeptr NodePtr;
@@ -23,7 +21,7 @@ namespace wc{
     };
 
     template<class Type, class Ptr>
-    struct MyMembers<std::_List_node<Type, Ptr>> : MembersHelper<std::_List_node<Type, Ptr>>
+    struct MembersOf<std::_List_node<Type, Ptr>> : MembersHelper<std::_List_node<Type, Ptr>>
     {
         typedef std::_List_node<Type, Ptr> Self;
         typedef Members<Self,

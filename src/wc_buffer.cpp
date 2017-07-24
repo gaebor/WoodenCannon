@@ -79,17 +79,6 @@ namespace wc{
         return size_;
     }
 
-    //BufferType* Buffer::GetBin(void* p) const
-    //{
-    //    return GetIterator(p)->second;
-    //}
-
-    //Buffer::OrderedType::const_iterator Buffer::GetIterator(void* p) const
-    //{
-    //    //return --(ordered_.upper_bound((void**)p));
-    //    return ordered_.end();
-    //}
-
     void Buffer::InsertNew(BufferType* new_buffer)
     {
         buffers_.push_back(new_buffer);

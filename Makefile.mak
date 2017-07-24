@@ -1,4 +1,4 @@
-CPPFLAGS=/EHsc /MT /Ot /Ox /nologo /Isrc /DWC_NETWORK
+CPPFLAGS=/EHsc /MT /Ot /Ox /nologo /Iinc /DWC_NETWORK
 LIBFLAGS=/nologo
 
 test_sources=test_src\*.cpp
@@ -16,7 +16,7 @@ run: test
 	cl /c $(CPPFLAGS) /Fo"test_src/" $<
 
 {src\}.cpp{src\}.obj::
-	cl /c $(CPPFLAGS) /Fo"src/" $<
+	cl /c $(CPPFLAGS) /Isrc /Fo"src/" $<
     
 all: clean run
 

@@ -1,4 +1,4 @@
-CPPFLAGS+=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Isrc -DWC_NETWORK -O2
+CPPFLAGS+=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Iinc -DWC_NETWORK -O2
 CPP=g++
 AR=ar
 
@@ -18,7 +18,7 @@ test_src/%.o :: test_src/%.cpp
 	$(CPP) $(CPPFLAGS) $< -o $@
 
 src/%.o :: src/%.cpp
-	$(CPP) $(CPPFLAGS) $< -o $@
+	$(CPP) $(CPPFLAGS) -Isrc $< -o $@
 
 all: clean run
 

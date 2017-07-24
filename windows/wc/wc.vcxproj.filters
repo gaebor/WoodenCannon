@@ -35,50 +35,50 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\wc_core.h">
+    <ClInclude Include="..\..\inc\wc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc.h">
+    <ClInclude Include="..\..\inc\wc_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_stl.h">
+    <ClInclude Include="..\..\inc\wc_functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_inheritance.h">
+    <ClInclude Include="..\..\inc\wc_inheritance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_member.h">
+    <ClInclude Include="..\..\inc\wc_member.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_network.h">
+    <ClInclude Include="..\..\inc\wc_network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_functions.h">
+    <ClInclude Include="..\..\inc\wc_stl.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_list.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_list_msc_1800.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_list_msc_1910.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_vector.h">
+      <Filter>Header Files\stl\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_vector_msc_1800.h">
+      <Filter>Header Files\stl\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_vector_msc_1910.h">
+      <Filter>Header Files\stl\vector</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\wc_buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wc_config.h">
+    <ClInclude Include="..\..\inc\wc_core.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_list_msc_1800.h">
-      <Filter>Header Files\stl\list</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_list_msc_1910.h">
-      <Filter>Header Files\stl\list</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_list.h">
-      <Filter>Header Files\stl\list</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_vector.h">
-      <Filter>Header Files\stl\vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_vector_msc_1800.h">
-      <Filter>Header Files\stl\vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\wc_vector_msc_1910.h">
-      <Filter>Header Files\stl\vector</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

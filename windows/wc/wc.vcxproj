@@ -24,21 +24,21 @@
     <ClCompile Include="..\..\src\wc_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\inc\wc.h" />
+    <ClInclude Include="..\..\inc\wc_config.h" />
+    <ClInclude Include="..\..\inc\wc_core.h" />
+    <ClInclude Include="..\..\inc\wc_functions.h" />
+    <ClInclude Include="..\..\inc\wc_inheritance.h" />
+    <ClInclude Include="..\..\inc\wc_list.h" />
+    <ClInclude Include="..\..\inc\wc_list_msc_1800.h" />
+    <ClInclude Include="..\..\inc\wc_list_msc_1910.h" />
+    <ClInclude Include="..\..\inc\wc_member.h" />
+    <ClInclude Include="..\..\inc\wc_network.h" />
+    <ClInclude Include="..\..\inc\wc_stl.h" />
+    <ClInclude Include="..\..\inc\wc_vector.h" />
+    <ClInclude Include="..\..\inc\wc_vector_msc_1800.h" />
+    <ClInclude Include="..\..\inc\wc_vector_msc_1910.h" />
     <ClInclude Include="..\..\src\wc_buffer.h" />
-    <ClInclude Include="..\..\src\wc_config.h" />
-    <ClInclude Include="..\..\src\wc_functions.h" />
-    <ClInclude Include="..\..\src\wc_inheritance.h" />
-    <ClInclude Include="..\..\src\wc_list.h" />
-    <ClInclude Include="..\..\src\wc_list_msc_1800.h" />
-    <ClInclude Include="..\..\src\wc_list_msc_1910.h" />
-    <ClInclude Include="..\..\src\wc_member.h" />
-    <ClInclude Include="..\..\src\wc_network.h" />
-    <ClInclude Include="..\..\src\wc_stl.h" />
-    <ClInclude Include="..\..\src\wc.h" />
-    <ClInclude Include="..\..\src\wc_core.h" />
-    <ClInclude Include="..\..\src\wc_vector.h" />
-    <ClInclude Include="..\..\src\wc_vector_msc_1800.h" />
-    <ClInclude Include="..\..\src\wc_vector_msc_1910.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D8F2C850-AD2C-43E6-86FD-2302BF77054D}</ProjectGuid>
@@ -115,7 +115,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WC_NETWORK;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\inc;$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>
@@ -132,7 +132,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WC_NETWORK;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\inc;$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>
@@ -151,7 +151,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WC_NETWORK;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\inc;$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>
@@ -172,7 +172,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WC_NETWORK;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\inc;$(SolutionDir)\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>

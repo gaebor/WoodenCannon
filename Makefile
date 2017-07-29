@@ -1,4 +1,4 @@
-CPPFLAGS+=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Iinc -DWC_NETWORK -O2
+CPPFLAGS:=-c -Wall -Wfatal-errors -Wno-invalid-offsetof -std=c++11 -Iinc -DWC_NETWORK -O2 $(CPPFLAGS)
 CPP=g++
 AR=ar
 

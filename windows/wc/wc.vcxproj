@@ -24,6 +24,7 @@
     <ClCompile Include="..\..\src\wc_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\inc\wc_stitcher.h" />
     <ClInclude Include="..\..\inc\wc.h" />
     <ClInclude Include="..\..\inc\wc_config.h" />
     <ClInclude Include="..\..\inc\wc_core.h" />

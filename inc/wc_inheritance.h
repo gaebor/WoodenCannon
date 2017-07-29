@@ -3,7 +3,7 @@
 
 namespace wc {
 
-    template<class C> class Stitcher;
+    template<class C> struct Stitcher;
 
     //! this is for iterating over the parents (compile time)
     template <class C, typename ...Arguments>

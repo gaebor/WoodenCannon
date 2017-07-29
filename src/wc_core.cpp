@@ -10,7 +10,7 @@
 #include "wc_network.h"
 #include "wc_buffer.h"
 
-#if __cplusplus > 201100L
+#if __cplusplus > 201100L || _MSC_VER >= 1900
 #ifdef _MSC_VER
 #   define THREAD __declspec(thread)
 #else
@@ -18,7 +18,7 @@
 #endif // _MSC_VER
 #else 
 #   define THREAD 
-#endif // __cplusplus > 201100L
+#endif
 
 namespace wc {
 
@@ -104,9 +104,8 @@ bool ReadBuffer(FILE* f, size_t s)
 
 const char* get_compile_info()
 {
-    return WC_COMPILER_STR;
+    return WC_COMPILED_CONFIG;
 }
-
 
 }
 

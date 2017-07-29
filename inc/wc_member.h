@@ -5,7 +5,7 @@
 
 namespace wc{
 
-    template<class T> class Stitcher;
+    template<class T> struct Stitcher;
 
     //! represents a member of a class in general
     /*!

@@ -6,70 +6,16 @@
 
 #include "wc_config.h"
 
-#include "wc_inheritance.h"
-#include "wc_member.h"
-
-#define WC_QUOTE(name) #name
-#define WC_STRINGIZE(macro) WC_QUOTE(macro)
+#include "wc_stitcher.h"
 
 namespace wc {
 
+//! tells you the properties of WC
+/*!
+	If you can link against wc and the returned string of this function
+	is the same as WC_COMPILED_CONFIG then you should be OK
+*/
 const char* get_compile_info();
-
-#define WC_ERROR_MESSAGE1 "This object is not trivially copyable, please override its serialization method. See http://www.cplusplus.com/reference/type_traits/is_trivially_copyable/"
-
-// see https://social.msdn.microsoft.com/Forums/en-US/9ac98582-ea26-4349-aafb-5678aca73eef/pointertomember-template-arguments-in-variadic-templates?forum=vcgeneral
-
-//! custom callback
-template<class Class>
-class Callback
-{
-public:
-    static void Do(Class* x){}
-    static void UnDo(Class* x){}
-};
-
-/************************************************************************/
-/* Stitcher                                                             */
-/************************************************************************/
-
-template<class Class, bool>
-class StitcherProxy
-{
-public:
-    static void Do(Class* x)
-    {
-        Callback<Class>::Do(x);
-        ParentsOf<Class>::Do(x);
-        MembersOf<Class>::Do(x);
-    }
-    static void UnDo(Class* x)
-    {
-        MembersOf<Class>::UnDo(x);
-        ParentsOf<Class>::UnDo(x);
-        Callback<Class>::UnDo(x);
-    }
-};
-
-template<class Class>
-class Stitcher
-{
-public:
-    template<class F>
-    static void Custom(F f, Class* x)
-    {
-        ParentsOf<Class>::Custom(f, x);
-        MembersOf<Class>::Custom(f, x);
-    }
-    static void Do(Class* x)
-    {
-        StitcherProxy<Class, std::is_fundamental<Class>::value>::Do(x);
-    }
-    static void UnDo(Class* x)
-    {
-        StitcherProxy<Class, std::is_fundamental<Class>::value>::UnDo(x);
-    }
-};
 
 class Serializer
 {

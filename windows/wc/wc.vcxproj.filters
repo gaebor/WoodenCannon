@@ -80,5 +80,8 @@
     <ClInclude Include="..\..\inc\wc_core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\inc\wc_stitcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

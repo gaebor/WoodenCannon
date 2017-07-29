@@ -1,3 +1,5 @@
+#ifndef INCLUDE_WC_CONFIG_H
+#define INCLUDE_WC_CONFIG_H
 
 #ifndef WC_INITIAL_BUFFER_SIZE
 #   define WC_INITIAL_BUFFER_SIZE 16
@@ -32,7 +34,20 @@
 #   define WC_BIT_MODEL "ILP32"
 #endif // !WC_BIT_MODEL
 
-#define STRINGIZE(x) #x
+#ifdef _WIN64
+#define WC_BIT_WIDTH 64
+#elif defined _WIN32
+#define WC_BIT_WIDTH 32
+#endif
+
+#if __SIZEOF_POINTER__ == 8 && __CHAR_BIT__ == 8
+#define WC_BIT_WIDTH 64
+#elif __SIZEOF_POINTER__ == 4 && __CHAR_BIT__ == 8
+#define WC_BIT_WIDTH 32
+#endif
+
+#define _WC_STRINGIZE(x) #x
+#define WC_STRINGIZE(x) _WC_STRINGIZE(x)
 
 #ifdef _MSC_VER
 #ifdef _DEBUG
@@ -52,6 +67,9 @@
 #   define WC_COMPILER_VERSION ""
 #endif //
 
-#define WC_CPP_VERSION(cpp) STRINGIZE(cpp)
+#define WC_COMPILER_STR WC_BIT_MODEL "_" WC_BYTE_ORDER "-endian_" WC_COMPILER_TYPE "_" WC_COMPILER_VERSION "_cpp" WC_STRINGIZE(__cplusplus)
 
-#define WC_COMPILER_STR WC_BIT_MODEL "_" WC_BYTE_ORDER "-endian_" WC_COMPILER_TYPE "_" WC_COMPILER_VERSION "_cpp" WC_CPP_VERSION(__cplusplus)
+//! this macro tells you the compile time properties of WoodenCannon
+#define WC_COMPILED_CONFIG WC_STRINGIZE(WC_BIT_WIDTH) "bit_" WC_BYTE_ORDER "-endian"
+
+#endif

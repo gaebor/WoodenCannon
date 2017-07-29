@@ -1,4 +1,4 @@
-CPPFLAGS=/EHsc /MT /Ot /Ox /nologo /Iinc /DWC_NETWORK
+CPPFLAGS=/EHsc /MT /Ot /Ox /nologo /Iinc /DWC_NETWORK $(CPPFLAGS)
 LIBFLAGS=/nologo
 
 test_sources=test_src\*.cpp

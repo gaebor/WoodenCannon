@@ -1,21 +1,44 @@
 #include "MyClasses.h"
 
-ClassWithPtr::ClassWithPtr(int i) :i(i), b(new bool(true))
+ClassWithStrongPtr::ClassWithStrongPtr(int i) :i(i), b(new bool(true))
 {
 
 }
 
-ClassWithPtr::~ClassWithPtr()
+ClassWithStrongPtr::~ClassWithStrongPtr()
 {
     delete b;
 }
 
-bool ClassWithPtr::operator==(const ClassWithPtr& other)
+bool ClassWithStrongPtr::operator==(const ClassWithStrongPtr& other)const
 {
     return i == other.i;
 }
 
-ClassWithPtr::ClassWithPtr(const ClassWithPtr& other)
+ClassWithStrongPtr::ClassWithStrongPtr(const ClassWithStrongPtr& other)
     : i(other.i), b(new bool(*other.b))
 {
 }
+
+ClassWithWeakPtr::ClassWithWeakPtr(int i)
+: i(i), p(this)
+{
+}
+
+ClassWithWeakPtr::~ClassWithWeakPtr(void){}
+
+bool ClassWithWeakPtr::operator==(const ClassWithWeakPtr& other)const
+{
+	return i == other.i;
+}
+
+//{
+//public:
+//	int i;
+//	void* p;
+//public:
+//	ClassWithWeakPtr(int i);
+//	ClassWithWeakPtr(const ClassWithWeakPtr& other);
+//	~ClassWithWeakPtr();
+//	bool operator == (const ClassWithWeakPtr& other);
+//};

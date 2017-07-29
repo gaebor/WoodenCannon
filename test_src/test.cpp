@@ -21,7 +21,10 @@ void PrintLayout(const char* name, T* t = nullptr)
 {
     std::cout << name;
     wc::Stitcher<T>::Custom(
-        [](size_t x){ std::cout << ' ' << x; }
+        [&t](size_t x)
+		{
+			std::cout << ' ' << x-(size_t)t;
+		}
     , t);
     std::cout << ' ' << sizeof(T);
 }
@@ -131,10 +134,16 @@ int main(int argc, char* argv[])
     Test(&mul, "Mul.bin");
 
     {
-        ClassWithPtr cp(10);
-        PrintLayout("ClassWithPtr", &cp);
-        Test(&cp, "class_ptr.bin");
+        ClassWithStrongPtr cp(10);
+        PrintLayout("ClassWithStrongPtr", &cp);
+        Test(&cp, "class_strong_ptr.bin");
     }
+
+	{
+		ClassWithWeakPtr cp(10);
+		PRINT_LAYOUT(ClassWithWeakPtr);
+		Test(&cp, "class_weak_ptr.bin");
+	}
 
     PRINT_LAYOUT(ComplexChild);
     Test(&cc, "ComplexChild.bin");
@@ -155,13 +164,13 @@ int main(int argc, char* argv[])
     Test(&vo, "vector_odd.bin");
     }
 
-    {
-        std::vector<wc::ResponsiblePtr<Odd>> vp;
-        printf("vector<responsible>");
-        vp.emplace_back(new Odd()); vp.back()->a = 1;
-        vp.emplace_back(new Odd()); vp.back()->a = 2;
-        Test(&vp, "vector_ptr.bin");
-    }
+    //{
+    //    std::vector<wc::ResponsiblePtr<Odd>> vp;
+    //    printf("vector<responsible>");
+    //    vp.emplace_back(new Odd()); vp.back()->a = 1;
+    //    vp.emplace_back(new Odd()); vp.back()->a = 2;
+    //    Test(&vp, "vector_ptr.bin");
+    //}
 
     printf("vector_vector");
     Test(&m, "vector_vector.bin");

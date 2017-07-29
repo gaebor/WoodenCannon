@@ -145,6 +145,12 @@ int main(int argc, char* argv[])
 		Test(&cp, "class_weak_ptr.bin");
 	}
 
+	{
+		ClassWithUnusedData cp;
+		printf("ClassWithUnusedData\n");
+		Test(&cp, "class_with_unused.bin");
+	}
+
     PRINT_LAYOUT(ComplexChild);
     Test(&cc, "ComplexChild.bin");
 

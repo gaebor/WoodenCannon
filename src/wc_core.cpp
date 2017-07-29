@@ -151,3 +151,13 @@ void* operator new (size_t count)
             throw wc::nomem;
     }
 }
+
+void operator delete(void* ptr) noexcept
+{
+	if (!wc::serialize) free(ptr);
+}
+
+void operator delete(void* ptr, const std::nothrow_t& nothrow_constant) noexcept
+{
+	if (!wc::serialize) free(ptr);
+}

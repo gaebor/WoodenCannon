@@ -38,3 +38,13 @@ namespace wc {
 	{};
 
 }
+
+class ClassWithUnusedData
+{
+public:
+public:
+	ClassWithUnusedData();
+	ClassWithUnusedData(const ClassWithUnusedData& other);
+	~ClassWithUnusedData();
+	bool operator == (const ClassWithUnusedData& other)const;
+};

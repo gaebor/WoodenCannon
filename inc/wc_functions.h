@@ -9,6 +9,9 @@
 void* operator new (size_t count);
 void* operator new (size_t count, const std::nothrow_t& tag) throw();
 
+void operator delete (void* ptr) noexcept;
+void operator delete (void* ptr, const std::nothrow_t&) noexcept;
+
 namespace wc {
     template<class Int, size_t d>
     struct RoundD

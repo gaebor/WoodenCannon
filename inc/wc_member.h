@@ -22,7 +22,6 @@ namespace wc{
         template<class F>
         static void Custom(F f, C* c)
         {
-            f((size_t)c + offset);
             Stitcher<T>::Custom(f, (T*)((size_t)c + offset));
         }
     };
@@ -128,7 +127,7 @@ namespace wc{
         template<class F>
         static void Custom(F f, C* c)
         {
-            f((size_t)c + offset);
+			Stitcher<T*>::Custom(f, (T**)((size_t)c + offset));
             Stitcher<T>::Custom(f, *(T**)((size_t)c + offset));
         }
     };

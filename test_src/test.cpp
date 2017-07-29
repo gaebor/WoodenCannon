@@ -16,17 +16,15 @@
 #include "responsible_member.h"
 #include "MyClasses.h"
 
-template<typename T>
-void PrintLayout(const char* name, T* t = nullptr)
+template<class T>
+void PrintLayout(const char* name, T* t = reinterpret_cast<T*>(sizeof(void*)))
 {
-    std::cout << name;
     wc::Stitcher<T>::Custom(
-        [&t](size_t x)
+        [&t](void* x, size_t size, const char* name)
 		{
-			std::cout << ' ' << x-(size_t)t;
+			std::cout << ' ' << name << "[" << (size_t)x-(size_t)t << "," << size + ((size_t)x - (size_t)t) << ")";
 		}
     , t);
-    std::cout << ' ' << sizeof(T);
 }
 
 template<class T, bool assign>
@@ -185,12 +183,13 @@ int main(int argc, char* argv[])
 
 	{
 		ClassWithUnusedData cp;
-		printf("ClassWithUnusedData\n");
+		PRINT_LAYOUT(ClassWithUnusedData);
 		Test<ClassWithUnusedData, true>(&cp, "class_with_unused.bin");
 	}
 
     PRINT_LAYOUT(ComplexChild);
     Test(&cc, "ComplexChild.bin");
+
 
     {
     std::vector<MyParent> vs;

@@ -1,6 +1,8 @@
 #ifndef INCLUDE_WC_STITCHER_H
 #define INCLUDE_WC_STITCHER_H
 
+#include <typeinfo>
+
 #include "wc_inheritance.h"
 #include "wc_member.h"
 
@@ -45,6 +47,7 @@ namespace wc {
 		template<class F>
 		static void Custom(F f, Class* x)
 		{
+			f((void*)x, sizeof(Class), typeid(Class).name());
 			ParentsOf<Class>::Custom(f, x);
 			MembersOf<Class>::Custom(f, x);
 		}
@@ -81,10 +84,9 @@ namespace wc {
 	struct Stitcher<Class*> : StitcherProxy<Class*, true>
 	{
 		template<class F>
-		static void Custom(F f, Class* x)
+		static void Custom(F f, Class** x)
 		{
-			ParentsOf<Class>::Custom(f, x);
-			MembersOf<Class>::Custom(f, x);
+			f((void*)x, sizeof(Class*), typeid(Class*).name());
 		}
 	};
 

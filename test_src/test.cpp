@@ -29,49 +29,87 @@ void PrintLayout(const char* name, T* t = nullptr)
     std::cout << ' ' << sizeof(T);
 }
 
-template<typename T>
+template<class T, bool assign>
+struct TestInternal
+{
+	static bool Do(T* original, unsigned char*);
+};
+
+template<class T>
+struct TestInternal<T, true>
+{
+	static bool Do(T* original, unsigned char* buffer)
+	{
+		T reconstructed;
+		wc::Serializer::UnDo<T>(reconstructed, buffer);
+		// and then compare
+		return reconstructed == *original;
+	}
+};
+
+template<class T>
+struct TestInternal<T, false>
+{
+	static bool Do(T* original, unsigned char* buffer)
+	{
+		T* reconstructed = wc::Serializer::UnDo<T>(buffer);
+		const bool result(*reconstructed == *original);
+		delete reconstructed;
+		return result;
+	}
+};
+
+template<class T, bool assign = false>
 void Test(T* original, const char* fname)
 {
-    try
-    {
-        FILE* f = fopen(fname, "rb");
-        if (f)
-        {   // reads from file into buffer
-            wc::ReadBuffer(f);
-            fclose(f);
-        }
-        else
-        {  // serializes
-            wc::Serializer::Do(original);
-        }
+	wc::BufferType* buffer;
+	FILE* f = fopen(fname, "rb");
+	try
+	{
+		if (f)
+		{   // reads from file into buffer
+			wc::ReadBuffer(f);
+			fclose(f);
+		}
+		else
+		{  // serializes
+			wc::Serializer::Do(original);
+		}
 
-        wc::PrintBuffer();
-        std::cout << std::endl;
+		wc::PrintBuffer();
+		std::cout << std::endl;
 
-        auto buffer = *wc::GetBuffer();
+		buffer = wc::GetBuffer();
+		auto tmp_buffer = *buffer;
 
-        // de-serializes
-        T* reconstructed = wc::Serializer::UnDo<T>(wc::BufferType(buffer).data());
-        // and then compare
-        if (!(*reconstructed == *original))
-        {
-            goto FAILED;
-        }
-        // if successful then write serialized object into file
-        f = fopen(fname, "wb");
-        if (f)
-        {
-            auto const written = fwrite(buffer.data(), sizeof(wc::BufferType::value_type), buffer.size(), f);
-            if (written != buffer.size() || fclose(f) == EOF)
-                goto FAILED;
-        }else
-            goto FAILED;
-        delete reconstructed;
-    }
-    catch (...)
-    {
-        goto FAILED;
-    }
+		// de-serializes
+		if (!TestInternal<T, assign>::Do(original, tmp_buffer.data()))
+		{
+			std::cerr << "reconstructed is not equal to original!" << std::endl;
+			goto FAILED;
+		}
+	}catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		goto FAILED;
+	}
+
+    // if successful then write serialized object into file
+    f = fopen(fname, "wb");
+	if (f)
+	{
+		auto const written = fwrite(buffer->data(), sizeof(wc::BufferType::value_type), buffer->size(), f);
+		if (written != buffer->size() || fclose(f) == EOF)
+		{
+			std::cerr << "unable to write in file \"" << fname << "\"" <<std::endl;
+			goto FAILED;
+		}
+	}else
+	{
+		std::cerr << "unable to open file \"" << fname << "\" for writing!" << std::endl;
+		goto FAILED;
+	}
+ 
     return;
 FAILED:
     fprintf(stderr, "Failed!\n");
@@ -125,10 +163,10 @@ int main(int argc, char* argv[])
     }
 
     PRINT_LAYOUT(Z);
-    Test(&z, "Z.bin");
+    Test<Z, true>(&z, "Z.bin");
 
     PRINT_LAYOUT(Add);
-    Test(&add, "Add.bin");
+    Test<Add, true>(&add, "Add.bin");
 
     PRINT_LAYOUT(Mul);
     Test(&mul, "Mul.bin");
@@ -148,7 +186,7 @@ int main(int argc, char* argv[])
 	{
 		ClassWithUnusedData cp;
 		printf("ClassWithUnusedData\n");
-		Test(&cp, "class_with_unused.bin");
+		Test<ClassWithUnusedData, true>(&cp, "class_with_unused.bin");
 	}
 
     PRINT_LAYOUT(ComplexChild);

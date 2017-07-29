@@ -6,30 +6,34 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <unordered_set>
 
 #include "wc_network.h"
 #include "wc_buffer.h"
 
 #if __cplusplus > 201100L || _MSC_VER >= 1900
-#ifdef _MSC_VER
-#   define THREAD __declspec(thread)
-#else
 #   define THREAD thread_local
-#endif // _MSC_VER
 #else 
 #   define THREAD 
 #endif
 
 namespace wc {
 
-static THREAD Buffer buffer; // TODO thread safe, basically this is thread_local
-static THREAD bool serialize = false; // TODO thread safe
+static THREAD Buffer buffer;
+static THREAD bool serialize = false;
+
+THREAD std::unordered_set<void*> allocated_pointers;
+static bool IsFamiliar(void* ptr)
+{
+	return allocated_pointers.find(ptr) != allocated_pointers.end();
+}
 
 static std::bad_alloc nomem;
 
 void Serializer::callback_one()
 {
     buffer.Clear();
+	allocated_pointers.clear();
     serialize = true;
 }
 
@@ -44,7 +48,7 @@ void Serializer::callback_three()
     buffer.ReArrange();
 }
 
-const BufferType* GetBuffer()
+BufferType* GetBuffer()
 {
     return buffer.GetFirst();
 }
@@ -136,9 +140,12 @@ void* operator new (size_t count)
         const auto former_size_round = rounder::Do(former_size);
 
         wc::serialize = false;
+		//--------------------
         if (former_size_round != former_size)
             wc::buffer.Allocate(former_size_round - former_size);
         auto result = wc::buffer.Allocate(count);
+		wc::allocated_pointers.insert(result);
+		//--------------------
         wc::serialize = true;
         return result;
     }
@@ -154,10 +161,12 @@ void* operator new (size_t count)
 
 void operator delete(void* ptr) noexcept
 {
-	if (!wc::serialize) free(ptr);
+	if (!wc::serialize || !wc::IsFamiliar(ptr))
+		free(ptr);
 }
 
 void operator delete(void* ptr, const std::nothrow_t& nothrow_constant) noexcept
 {
-	if (!wc::serialize) free(ptr);
+	if (!wc::serialize || !wc::IsFamiliar(ptr))
+		free(ptr);
 }

@@ -41,22 +41,30 @@ public:
     }
 
     //! reconstructs an object from memory, in-place version
+	/*!
+		@param target this object is assigned via an `operator=`
+		If your class has no operator= (for example is const qualified)
+		then this generates a compiler error
+	*/
     template<class Class>
-    static void UnDo(Class* place, unsigned char* data) throw()
+    static void UnDo(Class& target, unsigned char* data) throw()
     {
         // this thing is a pointer to a broken object
         auto thing = (Class*)data;
         // this is where it gets untangled (un-stitched)
         Stitcher<Class>::UnDo(thing);
-        // calls a decent copy constructor, the buffer now contains a proper Class object
-        new (place)Class(*thing);
+        // calls an `operator=`
+		// the buffer now contains a proper Class object
+		target = *((Class*)thing);
     }
     //! reconstructs an object from memory
     /*!
         @param data should hold the uncorrupted, serialized data.
         The length of the data is not checked, user should guarantee that the whole object is there
-        The pointed array in the memory shall be modified during the process.
+        Also, the function does not provide any information about the consumed bytes (size of the object).
+		The pointed array in the memory will be modified during the process.
         After the reconstruction one cannot reconstruct an other instance.
+		@return the returned object is made via a copy constructor.
     */
     template<class Class>
     static Class* UnDo(unsigned char* data)

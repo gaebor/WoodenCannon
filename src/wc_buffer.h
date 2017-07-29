@@ -24,11 +24,12 @@ namespace wc{
         size_t GetBlockSize()const;
         //! allocates given bytes into internal buffer(s)
         /*!
-            this may throw
+			basically, this imitates malloc
+            may throw
         */
         void* Allocate(size_t s);
         ~Buffer();
-        const BufferType* GetFirst()const;
+        BufferType* GetFirst();
         //! melts the blocks together
         void ReArrange();
         //! determines the appropriate offset to move the pointer
@@ -55,7 +56,7 @@ namespace wc{
         OrderedType ordered_;
         typedef OrderedType::key_type keyptr;
         HolderType buffers_;
-        OrderedType::const_iterator GetIterator(void* p)const;
+        // OrderedType::const_iterator GetIterator(void* p)const;
         std::unordered_map<keyptr, std::unordered_map<keyptr, std::ptrdiff_t>> offsets_;
 
         //! determines which buffer is the pointed target in

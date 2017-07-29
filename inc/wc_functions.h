@@ -37,7 +37,7 @@ namespace wc {
 
     typedef std::vector<unsigned char> BufferType;
 
-    const BufferType* GetBuffer();
+    BufferType* GetBuffer();
     //! Writes the current buffer into a file, as-is
     bool WriteBuffer(FILE*);
     //! Reads the content of a file into the current buffer, as-is

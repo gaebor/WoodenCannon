@@ -34,8 +34,10 @@ namespace wc{
 
     void* Buffer::Allocate(size_t s)
     {
-        if (buffers_.empty())
-            return GetNew(s)->data();
+		if (buffers_.empty())
+		{
+			return GetNew(s)->data();
+		}
         auto last = *(--buffers_.end());
         if (last->size() + s <= last->capacity())
         { // fits in the last buffer
@@ -43,8 +45,10 @@ namespace wc{
             last->resize(last->size() + s); // no reallocation
             size_ += s;
             return end;
-        }else // a new one is needed
-            return GetNew(s)->data();
+		}else // a new one is needed
+		{
+			return GetNew(s)->data();
+		}
     }
 
     void Buffer::ReArrange()
@@ -103,7 +107,7 @@ namespace wc{
             candidate->data() < after->data();
     }
 
-    const BufferType* Buffer::GetFirst() const
+    BufferType* Buffer::GetFirst()
     {
             return buffers_[0];
     }

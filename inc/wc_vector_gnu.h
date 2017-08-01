@@ -3,7 +3,6 @@ namespace wc {
     template <class container>
     struct VectorHelper
     {
-        // typedef std::_Vector_base<Ty, All> Base;
         typedef std::_Vector_base<typename container::value_type, typename container::allocator_type> Base;
         typedef Pointer<container, offsetof(Base, _M_impl._M_start)> begin;
         typedef Pointer<container, offsetof(Base, _M_impl._M_finish)> end;

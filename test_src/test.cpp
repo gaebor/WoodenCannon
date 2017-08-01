@@ -7,8 +7,10 @@
 #include "wc.h"
 
 #ifdef __GNUC__
-#include "wc_stl.h"
+#include "wc_list.h"
 #endif 
+
+#include "wc_vector.h"
 
 #include "test_virtual.h"
 #include "c_style_class.h"
@@ -17,12 +19,12 @@
 #include "MyClasses.h"
 
 template<class T>
-void PrintLayout(const char* name, T* t = reinterpret_cast<T*>(sizeof(void*)))
+void PrintLayout(const char* name, T* t = reinterpret_cast<T*>(sizeof(T)))
 {
     wc::Stitcher<T>::Custom(
         [&t](void* x, size_t size, const char* name)
 		{
-			std::cout << ' ' << name << "[" << (size_t)x-(size_t)t << "," << size + ((size_t)x - (size_t)t) << ")";
+			std::cout << name << "[" << (size_t)x-(size_t)t << "," << size + ((size_t)x - (size_t)t) << ")";
 		}
     , t);
 }
@@ -118,6 +120,13 @@ int main(int argc, char* argv[])
 {
     std::cerr << wc::get_compile_info() << std::endl;
 
+	//{
+	////std::cout << &(((std::vector<int>*)nullptr)->_Myfirst()) << std::endl;
+	////std::cout << &(((std::vector<int>*)nullptr)->_Mylast()) << std::endl;
+	////std::cout << &(((std::vector<int>*)nullptr)->_Myend()) << std::endl;
+	//std::cout << &(((std::vector<int>*)nullptr)->_Myproxy()) << std::endl;
+	//return 1;
+	//}
     Add add; Mul mul;
     Z z; ComplexChild cc;
 
@@ -187,9 +196,8 @@ int main(int argc, char* argv[])
 		Test<ClassWithUnusedData, true>(&cp, "class_with_unused.bin");
 	}
 
-    PRINT_LAYOUT(ComplexChild);
+    PrintLayout("ComplexChild", &cc);
     Test(&cc, "ComplexChild.bin");
-
 
     {
     std::vector<MyParent> vs;

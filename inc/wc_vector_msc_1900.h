@@ -4,11 +4,15 @@ namespace wc {
 	struct VectorHelper
 	{
 		typedef std::vector<Ty, All> container;
-		typedef std::_Vector_base<Ty, All> Base;
-
-		typedef Pointer<container, offsetof(container, _Myfirst)> begin;
-		typedef Pointer<container, offsetof(container, _Mylast)> end;
-		typedef Pointer<container, offsetof(container, _Myend)> endend;
+		//typedef std::_Vector_base<Ty, All> Base;
+#ifdef _DEGUB
+		static const size_t debug_offset = sizeof(void*);
+#else
+		static const size_t debug_offset = 0;
+#endif
+		typedef Pointer<container, debug_offset + 0 * sizeof(void*)> begin;
+		typedef Pointer<container, debug_offset + 1 * sizeof(void*)> end;
+		typedef Pointer<container, debug_offset + 2 * sizeof(void*)> endend;
 
 		typedef Members<container, begin, end, endend> Hacker;
 	};
@@ -17,7 +21,7 @@ namespace wc {
 	struct MembersOf<std::vector<Ty, All>> :
 		Members<std::vector<Ty, All>,
 #ifdef _DEBUG
-		Responsible<std::vector<Ty, All>, offsetof(container, _Myproxy), std::_Container_proxy>,
+		Responsible<std::vector<Ty, All>, 0, std::_Container_proxy>,
 #endif // _DEBUG
 		typename VectorHelper<Ty, All>::begin,
 		typename VectorHelper<Ty, All>::end,
@@ -28,7 +32,7 @@ namespace wc {
 	template <>
 	struct MembersOf<std::_Container_proxy>
 		: Members< std::_Container_proxy,
-			Pointer<std::_Container_proxy, offsetof(std::_Container_proxy, _Mycont)>
+		Pointer<std::_Container_proxy, offsetof(std::_Container_proxy, _Mycont)>
 		>
 	{};
 

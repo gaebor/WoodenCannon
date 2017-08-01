@@ -145,28 +145,24 @@ namespace wc{
     template<class C>
     struct MembersHelper
     {
-        template<class T C::*member>
-        struct m
-        {
-            static const size_t offset = ((size_t)&reinterpret_cast<char const volatile&>((((C*)nullptr)->*member)));
-            typedef Member<C, offset, T> Type;
-        };
+        //template<class T C::*member>
+        //struct m
+        //{
+        //    static const size_t offset = ((size_t)&reinterpret_cast<char const volatile&>((((C*)nullptr)->*member)));
+        //    typedef Member<C, offset, T> Type;
+        //};
 
         template<size_t _offset, typename T>
-        struct M
-        {
-            typedef Member<C, _offset, T> Type;
-        };
+        struct M : Member<C, _offset, T>
+        {};
+
         template<size_t _offset, typename T = void>
-        struct P
-        {
-            typedef Pointer<C, _offset, T> Type;
-        };
+        struct P : Pointer<C, _offset, T>
+        {};
+
         template<size_t _offset, typename T>
-        struct R
-        {
-            typedef Responsible<C, _offset, T> Type;
-        };
+        struct R : Responsible<C, _offset, T>
+        {};
     };
 
 }

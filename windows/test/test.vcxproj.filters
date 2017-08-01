@@ -15,39 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\test_src\test_virtual.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\test_src\test.cpp">
+    <ClCompile Include="..\..\test_src\c_style_class.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\test_src\complex_type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\test_src\MyClasses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\test_src\responsible_member.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\test_src\c_style_class.cpp">
+    <ClCompile Include="..\..\test_src\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\test_src\MyClasses.cpp">
+    <ClCompile Include="..\..\test_src\test_virtual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\test_src\test_virtual.h">
+    <ClInclude Include="..\..\test_src\c_style_class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\test_src\complex_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\test_src\MyClasses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\test_src\responsible_member.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\test_src\c_style_class.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\test_src\MyClasses.h">
+    <ClInclude Include="..\..\test_src\test_virtual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

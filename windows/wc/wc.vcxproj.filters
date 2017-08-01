@@ -83,5 +83,11 @@
     <ClInclude Include="..\..\inc\wc_stitcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\inc\wc_vector_msc_1900.h">
+      <Filter>Header Files\stl\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\wc_list_msc_1900.h">
+      <Filter>Header Files\stl\list</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

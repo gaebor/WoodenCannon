@@ -1,11 +1,9 @@
 namespace wc {
 
-	template <class Ty, class All>
+	template <class container>
 	struct VectorHelper
 	{
-		typedef std::vector<Ty, All> container;
-		//typedef std::_Vector_base<Ty, All> Base;
-#ifdef _DEGUB
+#ifdef _DEBUG
 		static const size_t debug_offset = sizeof(void*);
 #else
 		static const size_t debug_offset = 0;
@@ -23,9 +21,9 @@ namespace wc {
 #ifdef _DEBUG
 		Responsible<std::vector<Ty, All>, 0, std::_Container_proxy>,
 #endif // _DEBUG
-		typename VectorHelper<Ty, All>::begin,
-		typename VectorHelper<Ty, All>::end,
-		typename VectorHelper<Ty, All>::endend
+		typename VectorHelper<std::vector<Ty, All>>::begin,
+		typename VectorHelper<std::vector<Ty, All>>::end,
+		typename VectorHelper<std::vector<Ty, All>>::endend
 		>
 	{};
 

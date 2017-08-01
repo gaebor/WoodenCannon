@@ -24,6 +24,7 @@
     <ClCompile Include="..\..\src\wc_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\inc\wc_list_msc_1900.h" />
     <ClInclude Include="..\..\inc\wc_stitcher.h" />
     <ClInclude Include="..\..\inc\wc.h" />
     <ClInclude Include="..\..\inc\wc_config.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\..\inc\wc_stl.h" />
     <ClInclude Include="..\..\inc\wc_vector.h" />
     <ClInclude Include="..\..\inc\wc_vector_msc_1800.h" />
+    <ClInclude Include="..\..\inc\wc_vector_msc_1900.h" />
     <ClInclude Include="..\..\inc\wc_vector_msc_1910.h" />
     <ClInclude Include="..\..\src\wc_buffer.h" />
   </ItemGroup>

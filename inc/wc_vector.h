@@ -21,12 +21,13 @@ namespace wc {
 	struct Callback<std::vector<Ty, All>>
 	{
 		typedef std::vector<Ty, All> container;
+		typedef typename VectorHelper<container>::Hacker Hacker;
 		static void Do(container* v)
 		{
 			if (v->empty())
 			{   //hack!
 				auto const end = (void**)(v + 1);
-				VectorHelper<Ty, All>::Hacker::Custom([&end](void* x, size_t, const char*)
+				Hacker::Custom([&end](void* x, size_t, const char*)
 				{
 					*(void**)x = end;
 				}, v);
@@ -39,13 +40,13 @@ namespace wc {
 		{   //hack!
 			auto const end = (void**)(v + 1);
 			bool hacked = true;
-			VectorHelper<Ty, All>::Hacker::Custom([&end, &hacked](void* x, size_t, const char*)
+			Hacker::Custom([&end, &hacked](void* x, size_t, const char*)
 			{
 				hacked = (hacked && (*(void**)x == end));
 			}, v);
 			if (hacked)
 			{
-				VectorHelper<Ty, All>::Hacker::Custom([&end](void* x, size_t, const char*)
+				Hacker::Custom([&end](void* x, size_t, const char*)
 				{
 					*(void**)x = nullptr;
 				}, v);

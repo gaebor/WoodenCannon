@@ -120,13 +120,6 @@ int main(int argc, char* argv[])
 {
     std::cerr << wc::get_compile_info() << std::endl;
 
-	//{
-	////std::cout << &(((std::vector<int>*)nullptr)->_Myfirst()) << std::endl;
-	////std::cout << &(((std::vector<int>*)nullptr)->_Mylast()) << std::endl;
-	////std::cout << &(((std::vector<int>*)nullptr)->_Myend()) << std::endl;
-	//std::cout << &(((std::vector<int>*)nullptr)->_Myproxy()) << std::endl;
-	//return 1;
-	//}
     Add add; Mul mul;
     Z z; ComplexChild cc;
 

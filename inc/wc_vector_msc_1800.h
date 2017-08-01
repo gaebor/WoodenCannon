@@ -1,11 +1,8 @@
 namespace wc {
 
-	template <class Ty, class All>
+	template <class container>
 	struct VectorHelper
 	{
-		typedef std::vector<Ty, All> container;
-		typedef std::_Vector_base<Ty, All> Base;
-
 		typedef Pointer<container, offsetof(container, _Myfirst)> begin;
 		typedef Pointer<container, offsetof(container, _Mylast)> end;
 		typedef Pointer<container, offsetof(container, _Myend)> endend;
@@ -19,9 +16,9 @@ namespace wc {
 #ifdef _DEBUG
 		Responsible<std::vector<Ty, All>, offsetof(container, _Myproxy), std::_Container_proxy>,
 #endif // _DEBUG
-		typename VectorHelper<Ty, All>::begin,
-		typename VectorHelper<Ty, All>::end,
-		typename VectorHelper<Ty, All>::endend
+		typename VectorHelper<std::vector<Ty, All>>::begin,
+		typename VectorHelper<std::vector<Ty, All>>::end,
+		typename VectorHelper<std::vector<Ty, All>>::endend
 		>
 	{};
 

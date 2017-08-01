@@ -40,10 +40,66 @@ Note that solely the chipped `operator new` can serialize your objects during a 
     MyClass* serialized = new MyClass(*object_to_serialize);
     //switch back to the original `operator new`
 
-### Padding
-Note that 
+### Alignment
+The chipped `operator new` always rounds up the allocated space to ensure alignment.
+But only `alignof(std::max_align_t)` alignment is supported.
 
-The bytes of the serialized object are packed, but 
+The padding of the members are managed by the compiler, those paddings do not interfere with `wc`.
+
 ## Stitching
+After the aforementioned process, `wc` does a so called _Stitching_ during which
+
+* pointers are converted into a relative format, in this way you can use them across processes.
+* fundamental members are converted into network byte order (optional)
+* custom callbacks my be called
+
+### Pointers
+During stitching every pointer is converted like this:
+
+    void memory2buffer(void** p) { *p = *p - p; }
+
+Which means that the pointer becomes relative to its position. If a pointer points to itself, then becames `0`.
+The relative pointer `2` means that the pointer points two bytes after itself. Negative values mean that the pointer points somewhere before itself.
+
+In this way, the serialized object can be dumped into a file, and later its pointer became valid again (by converting back after read into memory again).
+
+    void buffer2memory(void** p) { *p = *p + p; }
+
+### Members
+Converting the pointers and the members (network byte order) requres the knowledge of the position of the members.
+
+This is done by the user who has to specialize a template class, which communicates the position (and type) of the members with `wc`.
+
+    template<>
+    wc::MembersOf<MyClass> ...
+
+You can define three type of members
+* plain member
+* pointer
+* responsible pointer
+
+The members of any class is a special list of these:
+
+    template<>
+    struct wc::MembersOf<MyClass>
+        : wc::Members<MyClass,
+            wc::Member<...>,
+            wc::Pointer<...>,
+            wc::Responsible<...>
+        >
+    {};
+
+A member template class has three template parameters:
+* the class for which it is a member of
+* its offset (`offsetof`)
+* its type
+
+For example
+
+    wc::Member<MyClass, 0, int>
+
+This means that your class has an `int` member at offset `0`. Or, lets say the member is `int MyClass::i` then
+
+    wc::Member<MyClass, offsetof(MyClass, i), decltype(i)>
 
 ## Fragments

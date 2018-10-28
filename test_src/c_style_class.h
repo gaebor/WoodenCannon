@@ -4,6 +4,7 @@
 #include "wc.h"
 #include <stddef.h>
 
+//! POD 
 class MyParent
 {
 public:
@@ -54,6 +55,9 @@ namespace wc {
         a and b are inherited from MyParent, flag is a true member.
         But this works also! For wc it doesn't matter how you got the members, as long as they have correct offsets and types.
         However wc::Stitcher<Z>::Custom will behave as Z ha no parent.
+
+        Also note that the member int X::x is totally missing, which is also fine, as long as
+        the missing member is POD and you don't want the network byte order
     */
     template<>
     struct MembersOf<Z> : Members<Z,

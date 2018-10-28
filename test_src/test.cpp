@@ -1,15 +1,13 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <string>
 #include <list>
 #include <stddef.h>
 
 #include "wc.h"
 
-#ifdef __GNUC__
 #include "wc_list.h"
-#endif 
-
 #include "wc_vector.h"
 
 #include "test_virtual.h"
@@ -18,15 +16,36 @@
 #include "responsible_member.h"
 #include "MyClasses.h"
 
-template<class T>
-void PrintLayout(const char* name, T* t = reinterpret_cast<T*>(sizeof(T)))
+struct LayoutPrinter
 {
-    wc::Stitcher<T>::Custom(
-        [&t](void* x, size_t size, const char* name)
-		{
-			std::cout << name << "[" << (size_t)x-(size_t)t << "," << size + ((size_t)x - (size_t)t) << ")";
-		}
-    , t);
+    LayoutPrinter(void* x = nullptr) : base(x){}
+    void operator()(void* x, const char* name, size_t size)
+    {
+        std::cout << preface << name << " [" << std::ptrdiff_t(x) - ptrdiff_t(base) << "," << std::ptrdiff_t(x) - ptrdiff_t(base) + std::ptrdiff_t(size) << ")" << std::endl;
+    }
+    void operator[](void* p)
+    {
+        base = p;
+        preface += "->";
+    }
+    void operator++()
+    {
+        preface += ' ';
+    }
+    void operator++(int)
+    {
+        preface += ':';
+    }
+    void* base;
+    std::string preface;
+};
+
+template<class T>
+void PrintLayout(const char* name, const T* t = reinterpret_cast<T*>(sizeof(T)))
+{
+    LayoutPrinter f((void*)t);
+    
+    wc::Stitcher<T>::Custom(f, t);
 }
 
 template<class T, bool assign>
@@ -118,7 +137,7 @@ FAILED:
 
 int main(int argc, char* argv[])
 {
-    std::cerr << wc::get_compile_info() << std::endl;
+    std::cout << wc::get_compile_info() << std::endl;
 
     Add add; Mul mul;
     Z z; ComplexChild cc;
@@ -188,23 +207,29 @@ int main(int argc, char* argv[])
 		PRINT_LAYOUT(ClassWithUnusedData);
 		Test<ClassWithUnusedData, true>(&cp, "class_with_unused.bin");
 	}
+    {
+        std::vector<int> simple_v;
+        PrintLayout("vector<int>", &simple_v);
+        Test(&simple_v, "emptyvector.bin");
+        simple_v.push_back(1); simple_v.push_back(2); simple_v.push_back(3);
+        Test(&simple_v, "vectorint.bin");
+    }
+    {
+        std::vector<MyParent> vs;
+        vs.emplace_back(); vs.back().a = 1;
+        vs.emplace_back(); vs.back().a = 2;
+        PrintLayout("vector_simple", &vs);
+        Test(&vs, "vector_simple.bin");
+    }
 
     PrintLayout("ComplexChild", &cc);
     Test(&cc, "ComplexChild.bin");
 
     {
-    std::vector<MyParent> vs;
-    vs.emplace_back(); vs.back().a = 1;
-    vs.emplace_back(); vs.back().a = 2;
-    PrintLayout<decltype(vs)>("vector_simple");
-    Test(&vs, "vector_simple.bin");
-    }
-
-    {
     std::vector<Odd> vo;
     vo.emplace_back(); vo.back().a = 1;
     vo.emplace_back(); vo.back().a = 2;
-    printf("vector_odd");
+    PrintLayout("vector_odd", &vo);
     Test(&vo, "vector_odd.bin");
     }
 
@@ -216,17 +241,17 @@ int main(int argc, char* argv[])
     //    Test(&vp, "vector_ptr.bin");
     //}
 
-    printf("vector_vector");
+    PrintLayout("vector_vector", &m);
     Test(&m, "vector_vector.bin");
 
-    printf("list_char");
+    PrintLayout("list_char", &l);
     Test(&l, "list_char.bin");
 
-    printf("list_Add");
+    PrintLayout("list_Add", &l2);
     Test(&l2, "list_Add.bin");
 
     l.clear();
-    printf("empty_list");
+    PrintLayout("empty_list", &l);
     Test(&l, "empty_list.bin");
 
     printf("Succeeded!\n");

@@ -51,6 +51,14 @@ namespace wc
                     );
             }
         }
+        template<typename F>
+        static void Custom(F& f, const container* v)
+        {
+            for (const auto& x : *v)
+            {
+                wc::Stitcher<typename container::value_type>::Custom(f, &x);
+            }
+        }
     };
 
 }

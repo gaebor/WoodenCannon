@@ -50,8 +50,9 @@ The padding of the members are managed by the compiler, those paddings do not in
 After the aforementioned process, `wc` does a so called _Stitching_ during which
 
 * pointers are converted into a relative format, in this way you can use them across processes.
+** nullptr is a bit special
 * fundamental members are converted into network byte order (optional)
-* custom callbacks my be called
+* custom callbacks may be called
 
 ### Pointers
 During stitching every pointer is converted like this:
@@ -65,8 +66,12 @@ In this way, the serialized object can be dumped into a file, and later its poin
 
     void buffer2memory(void** p) { *p = *p + p; }
 
+#### nullptr
+The nullptr is convreted to `std::numeric_limits<std::ptrdiff_t>::min()` which means that it is less than any other pointers.
+This trick fails if you use more than `std::numeric_limits<size_t>::max() / 2` memory!
+
 ### Members
-Converting the pointers and the members (network byte order) requres the knowledge of the position of the members.
+Converting the pointers and the members (network byte order) requires the knowledge of the position of the members.
 
 This is done by the user who has to specialize a template class, which communicates the position (and type) of the members with `wc`.
 

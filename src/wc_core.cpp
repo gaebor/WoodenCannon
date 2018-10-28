@@ -75,7 +75,7 @@ void PrintBuffer()
 
 void memory2buffer(void** p)
 {
-    auto const relative = (std::ptrdiff_t)(*p) - (std::ptrdiff_t)p + buffer.GetOffset(p);
+    auto const relative = *p ? ((std::ptrdiff_t)(*p) - (std::ptrdiff_t)p + buffer.GetOffset(p)) : std::numeric_limits<std::ptrdiff_t>::min();
     *p = (void*)relative;
     ByteReorder<sizeof(void*)>::Do(p);
 }
@@ -83,7 +83,7 @@ void memory2buffer(void** p)
 void buffer2memory(void** p)
 {
     ByteReorder<sizeof(void*)>::UnDo(p);
-    auto const absolute = (std::ptrdiff_t)(*p) + (std::ptrdiff_t)p;
+    auto const absolute = (std::ptrdiff_t)(*p) == std::numeric_limits<std::ptrdiff_t>::min() ? (std::ptrdiff_t)(nullptr) : (std::ptrdiff_t)(*p) + (std::ptrdiff_t)p;
     *p = (void*)absolute;
 }
 
@@ -113,7 +113,7 @@ const char* get_compile_info()
 
 }
 
-void* operator new (size_t count, const std::nothrow_t& tag) throw()
+void* operator new (size_t count, const std::nothrow_t&) throw()
 {
     try{
         return operator new (count);
@@ -165,7 +165,7 @@ void operator delete(void* ptr) noexcept
 		free(ptr);
 }
 
-void operator delete(void* ptr, const std::nothrow_t& nothrow_constant) noexcept
+void operator delete(void* ptr, const std::nothrow_t&) noexcept
 {
 	if (!wc::serialize || !wc::IsFamiliar(ptr))
 		free(ptr);

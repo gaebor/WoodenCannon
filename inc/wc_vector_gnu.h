@@ -7,8 +7,6 @@ namespace wc {
         typedef Pointer<container, offsetof(Base, _M_impl._M_start)> begin;
         typedef Pointer<container, offsetof(Base, _M_impl._M_finish)> end;
         typedef Pointer<container, offsetof(Base, _M_impl._M_end_of_storage)> endend;
-
-		typedef Members<container, begin, end, endend> Hacker;
     };
 
     template <class Ty, class All>

@@ -19,8 +19,8 @@ namespace wc{
         static const size_t offset = _offset;
         typedef T Type;
         typedef C Base;
-        template<class F>
-        static void Custom(F f, C* c)
+        template<typename F>
+        static void Custom(F& f, const C* c)
         {
             Stitcher<T>::Custom(f, (T*)((size_t)c + offset));
         }
@@ -36,7 +36,7 @@ namespace wc{
         static void UnDo(C* x);
         //! you can call your function for the members in a for loop
         template<typename F>
-        static void Custom(F f, C* x);
+        static void Custom(F& f, const C* x);
     };
 
     //! iteratively calls Member::Do on argument list
@@ -47,18 +47,18 @@ namespace wc{
         static void Do(C* x)
         {
             M::Do(x);
-            Members<C, Arguments...>::Do(x);
+            Next::Do(x);
         }
         static void UnDo(C* x)
         {
             M::UnDo(x);
-            Members<C, Arguments...>::UnDo(x);
+            Next::UnDo(x);
         }
         template<typename F>
-        static void Custom(F f, C* x)
+        static void Custom(F& f, const C* x)
         {
             M::Custom(f, x);
-            Members<C, Arguments...>::Custom(f, x);
+            Next::Custom(f, x);
         }
     };
 
@@ -70,7 +70,7 @@ namespace wc{
         static void Do(C* x){}
         static void UnDo(C* x){}
         template<typename F>
-        static void Custom(F f, C* x){}
+        static void Custom(F& f, const C* x){}
     };
 
     //! by default, the class C has an empty member list
@@ -94,6 +94,24 @@ namespace wc{
         }
     };
 
+    template <typename C, typename T, T C::*member>
+    struct Member2
+    {
+        template<typename F>
+        static void Custom(F& f, const C* c)
+        {
+            Stitcher<T>::Custom(f, &(c->*member));
+        }
+        static void Do(C* c)
+        {
+            Stitcher<T>::Do(&(c->*member));
+        }
+        static void UnDo(C* c)
+        {
+            Stitcher<T>::UnDo(&(c->*member));
+        }
+    };
+
     //! a member pointer, which is not to be copied
     template <class C, size_t _offset, typename T = void>
     struct Pointer : public AbstractMember<C, _offset, T*>
@@ -106,6 +124,24 @@ namespace wc{
         static void UnDo(C* c)
         {
             buffer2memory((void**)((size_t)c + offset));
+        }
+    };
+
+    template <typename C, typename T, T C::*member>
+    struct Pointer2
+    {
+        template<typename F>
+        static void Custom(F& f, const C* c)
+        {
+            Stitcher<T*>::Custom(f, &(c->*member));
+        }
+        static void Do(C* c)
+        {
+            memory2buffer(&(c->*member));
+        }
+        static void UnDo(C* c)
+        {
+            buffer2memory(&(c->*member));
         }
     };
 
@@ -124,11 +160,34 @@ namespace wc{
             buffer2memory((void**)((size_t)c + offset));
             Stitcher<T>::UnDo(*(T**)((size_t)c + offset));
         }
-        template<class F>
-        static void Custom(F f, C* c)
+        template<typename F>
+        static void Custom(F& f, const C* c)
         {
 			Stitcher<T*>::Custom(f, (T**)((size_t)c + offset));
-            Stitcher<T>::Custom(f, *(T**)((size_t)c + offset));
+            F f2 = f;
+            f2[(void*)(*(T**)((size_t)c + offset))];
+            Stitcher<T>::Custom(f2, *(T**)((size_t)c + offset));
+        }
+    };
+
+    template <typename C, typename T, T C::*member>
+    struct Responsible2
+    {
+        static void Do(C* c)
+        {
+            Stitcher<T>::Do(c->*member);
+            memory2buffer(&(c->*member));
+        }
+        static void UnDo(C* c)
+        {
+            buffer2memory(&(c->*member));
+            Stitcher<T>::UnDo(c->*member);
+        }
+        template<typename F>
+        static void Custom(F& f, const C* c)
+        {
+            Stitcher<T>::Custom(f, c->*member);
+            Stitcher<T*>::Custom(f, &(c->*member));            
         }
     };
 

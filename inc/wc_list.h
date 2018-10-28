@@ -10,6 +10,8 @@
 #define wc_header(PREFIX, VERSION) _wc_header(PREFIX, VERSION)
 
 #ifdef _MSC_VER
+#include "wc_xutility_msc.h"
+
 #include wc_header(wc_list_msc_, _MSC_VER)
 #elif defined __GNUC__
 #   include "wc_list_gnu.h"

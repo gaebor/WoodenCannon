@@ -11,8 +11,8 @@ namespace wc {
     {
         static void Do(C* x);
      
-        template<class F>
-        static void Custom(F f, C* x);
+        template<typename F>
+        static void Custom(F& f, const C* x);
         
         static void UnDo(C* x);
     };
@@ -20,21 +20,22 @@ namespace wc {
     template <class C, class P, typename ...Arguments>
     struct Parents<C, P, Arguments...>
     {
-        template<class F>
-        static void Custom(F f, C* x)
+        typedef Parents<C, Arguments...> Next;
+        template<typename F>
+        static void Custom(F& f, const C* x)
         {
-            Stitcher<P>::Custom(f, static_cast<P*>(x));
-            Parents<C, Arguments...>::Custom(f, x);
+            Stitcher<P>::Custom(f, static_cast<const P*>(x));
+            Next::Custom(f, x);
         }
         static void Do(C* x)
         {
             Stitcher<P>::Do(static_cast<P*>(x));
-            Parents<C, Arguments...>::Do(x);
+            Next::Do(x);
         }
         static void UnDo(C* x)
         {
             Stitcher<P>::UnDo(static_cast<P*>(x));
-            Parents<C, Arguments...>::UnDo(x);
+            Next::UnDo(x);
         }
     };
 
@@ -45,8 +46,8 @@ namespace wc {
         //! if there aren't any parents then does nothing
         static void Do(C* x){}
 
-        template<class F>
-        static void Custom(F f, C* x){}
+        template<typename F>
+        static void Custom(F& f, const C* x){}
 
         static void UnDo(C* x){}
     };

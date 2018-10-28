@@ -16,6 +16,8 @@ namespace wc {
 	{
 		static void Do(Class* x) {}
 		static void UnDo(Class* x) {}
+        template<typename F>
+		static void Custom(F& f, const  Class* x) {}
 	};
 
 	//!
@@ -44,12 +46,18 @@ namespace wc {
 	template<class Class>
 	struct Stitcher
 	{
-		template<class F>
-		static void Custom(F f, Class* x)
+		template<typename F>
+		static void Custom(F& f, const Class* x)
 		{
-			f((void*)x, sizeof(Class), typeid(Class).name());
-			ParentsOf<Class>::Custom(f, x);
-			MembersOf<Class>::Custom(f, x);
+            f((void*)x, typeid(Class).name(), sizeof(Class));
+            F f2 = f;
+            f2++;
+			ParentsOf<Class>::Custom(f2, x);
+            F f3 = f;
+            ++f3;
+			MembersOf<Class>::Custom(f3, x);
+
+            Callback<Class>::Custom(f, x);
 		}
 		static void Do(Class* x)
 		{
@@ -76,19 +84,19 @@ namespace wc {
 		}
 	};
 
-	//!
-	/*!
-		pointers are not fundamental
-	*/
-	template<class Class>
-	struct Stitcher<Class*> : StitcherProxy<Class*, true>
-	{
-		template<class F>
-		static void Custom(F f, Class** x)
-		{
-			f((void*)x, sizeof(Class*), typeid(Class*).name());
-		}
-	};
+	////!
+	///*!
+	//	pointers are not fundamental
+	//*/
+	//template<class Class>
+	//struct Stitcher<Class*> : StitcherProxy<Class*, true>
+	//{
+	//	template<typename F>
+	//	static void Custom(F f, Class** x)
+	//	{
+	//		f(x);
+	//	}
+	//};
 
 }
 

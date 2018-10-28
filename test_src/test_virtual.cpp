@@ -15,11 +15,6 @@ int Add::Op()
     return a + b;
 }
 
-int Zero::Op()
-{
-    return a;
-}
-
 int Mul::Op()
 {
     return flag ? -(a * b) : a * b;

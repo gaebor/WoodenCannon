@@ -50,12 +50,20 @@ public:
 };
 
 namespace wc {
+    /*! these members are falsely advertised as members of Z
+        a and b are inherited from MyParent, flag is a true member.
+        But this works also! For wc it doesn't matter how you got the members, as long as they have correct offsets and types.
+        However wc::Stitcher<Z>::Custom will behave as Z ha no parent.
+    */
     template<>
     struct MembersOf<Z> : Members<Z,
         Member<Z, offsetof(Z, a), decltype(Z::a)>,
         Member<Z, offsetof(Z, b), decltype(Z::b)>,
         Member<Z, offsetof(Z, flag), decltype(Z::flag)>>
     {};
+
 }
+
+
 
 #endif //INCLUDE_C_STYLE_H

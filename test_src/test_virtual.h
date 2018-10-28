@@ -36,12 +36,6 @@ namespace wc {
     {};
 }
 
-class Zero : public Add
-{
-public:
-    virtual int Op();
-};
-
 class Mul : public MyParentVirtual
 {
 public:
@@ -49,5 +43,20 @@ public:
     bool flag;
     virtual bool operator==(const Mul& other)const;
 };
+
+namespace wc {
+    template<>
+    struct MembersOf<Mul> :
+        Members<Mul,
+        Member<Mul, offsetof(Mul, flag), bool>
+        >
+    {};
+
+    template<>
+    struct ParentsOf<Mul> :
+        Parents<Mul, MyParentVirtual>
+    {};
+
+}
 
 #endif // INCLUDE_TEST_VIRTUAL_H

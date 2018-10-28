@@ -20,6 +20,7 @@ public:
 	void* p;
 public:
 	ClassWithWeakPtr(int i);
+    ClassWithWeakPtr(const ClassWithWeakPtr& other);
 	~ClassWithWeakPtr();
 	bool operator == (const ClassWithWeakPtr& other)const;
 };
@@ -34,9 +35,8 @@ namespace wc {
 	template<>
 	struct MembersOf<ClassWithWeakPtr> : Members<ClassWithWeakPtr,
 		Member<ClassWithWeakPtr, offsetof(ClassWithWeakPtr, i), int>,
-		Member<ClassWithWeakPtr, offsetof(ClassWithWeakPtr, p), void*>>
+		Pointer<ClassWithWeakPtr, offsetof(ClassWithWeakPtr, p)>>
 	{};
-
 }
 
 class ClassWithUnusedData

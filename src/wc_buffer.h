@@ -10,7 +10,7 @@ namespace wc{
 
     //! internal storage of blocks of memory
     /*!
-        This is not seen for the user if the library
+        This is not seen for the user in the library
     */
     class Buffer
     {

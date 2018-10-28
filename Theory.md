@@ -50,7 +50,7 @@ The padding of the members are managed by the compiler, those paddings do not in
 After the aforementioned process, `wc` does a so called _Stitching_ during which
 
 * pointers are converted into a relative format, in this way you can use them across processes.
-** nullptr is a bit special
+  * nullptr is a bit special
 * fundamental members are converted into network byte order (optional)
 * custom callbacks may be called
 

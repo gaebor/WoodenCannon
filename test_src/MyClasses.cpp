@@ -1,7 +1,6 @@
 #include "MyClasses.h"
 
-#include<string>
-#include<iostream>
+static std::vector<int> v;
 
 ClassWithStrongPtr::ClassWithStrongPtr(int i) :i(i), b(new bool(true))
 {
@@ -37,24 +36,26 @@ ClassWithWeakPtr::~ClassWithWeakPtr(void){}
 
 bool ClassWithWeakPtr::operator==(const ClassWithWeakPtr& other)const
 {
-	return i == other.i;
+    return i == other.i;
 }
 
 ClassWithUnusedData::ClassWithUnusedData()
 {
+    v.push_back(v.size());
 }
 
 ClassWithUnusedData::ClassWithUnusedData(const ClassWithUnusedData&)
 {
-	std::string str;
-	str = "UNUSED";
+    v.push_back(v.size());
 }
 
 ClassWithUnusedData::~ClassWithUnusedData()
 {
+    v.push_back(v.size());
 }
 
-bool ClassWithUnusedData::operator == (const ClassWithUnusedData&)const
+bool ClassWithUnusedData::operator== (const ClassWithUnusedData&)const
 {
+    v.push_back(v.size());
 	return true;
 }

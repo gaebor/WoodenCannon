@@ -3,58 +3,73 @@
 
 #include "wc.h"
 
-class MyParentVirtual
+class VirtualParent
 {
 public:
     int a, b;
     virtual int Op() = 0;
-    virtual bool operator==(const MyParentVirtual& other)const;
-    MyParentVirtual(){}
-    virtual ~MyParentVirtual(){}
+    virtual bool operator==(const VirtualParent& other)const;
+    VirtualParent(){}
+    virtual ~VirtualParent(){}
 };
 
 namespace wc {
     template<>
-    struct MembersOf<MyParentVirtual> : Members<MyParentVirtual,
-        Member<MyParentVirtual, offsetof(MyParentVirtual, a), int>,
-        Member<MyParentVirtual, offsetof(MyParentVirtual, b), int>>
+    struct MembersOf<VirtualParent> : Members<VirtualParent,
+        Member<VirtualParent, offsetof(VirtualParent, a), int>,
+        Member<VirtualParent, offsetof(VirtualParent, b), int>>
     {};
 }
 
-class Add : public MyParentVirtual
+class VirtualChild1 : public VirtualParent
 {
 public:
-    Add(){}
-    bool operator==(const Add& other)const;
+    VirtualChild1(){}
     virtual int Op();
-    ~Add(){}
+    ~VirtualChild1(){}
 };
 
 namespace wc {
     template<>
-    struct ParentsOf<Add> : Parents<Add, MyParentVirtual>
+    struct ParentsOf<VirtualChild1> : Parents<VirtualChild1, VirtualParent>
     {};
 }
 
-class Mul : public MyParentVirtual
+class VirtualParent2
 {
 public:
+    virtual int f() = 0;
+    bool operator==(const VirtualParent2& other)const;
+    int i;
+};
+
+class VirtualChild2 : public VirtualParent, public VirtualParent2
+{
+public:
+    virtual int f();
     virtual int Op();
-    bool flag;
-    virtual bool operator==(const Mul& other)const;
+    bool operator==(const VirtualChild2& other)const;
+    double x;
 };
 
 namespace wc {
     template<>
-    struct MembersOf<Mul> :
-        Members<Mul,
-        Member<Mul, offsetof(Mul, flag), bool>
+    struct MembersOf<VirtualParent2> :
+        Members<VirtualParent2,
+            Member<VirtualParent2, offsetof(VirtualParent2, i), int>
         >
     {};
 
     template<>
-    struct ParentsOf<Mul> :
-        Parents<Mul, MyParentVirtual>
+    struct ParentsOf<VirtualChild2> :
+        Parents<VirtualChild2, VirtualParent, VirtualParent2>
+    {};
+
+    template<>
+    struct MembersOf<VirtualChild2> :
+        Members<VirtualChild2,
+        Member<VirtualChild2, offsetof(VirtualChild2, x), double>
+        >
     {};
 
 }

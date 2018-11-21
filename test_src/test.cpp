@@ -41,7 +41,7 @@ struct LayoutPrinter
 };
 
 template<class T>
-void PrintLayout(const char* name, const T* t = reinterpret_cast<T*>(sizeof(T)))
+void PrintLayout(const T* t = reinterpret_cast<T*>(sizeof(T)))
 {
     LayoutPrinter f((void*)t);
     
@@ -137,33 +137,22 @@ FAILED:
 
 int main(int argc, char* argv[])
 {
-    std::cout << wc::get_compile_info() << std::endl;
+    std::cout << wc::get_compile_info() << " initial buffer: " << WC_INITIAL_BUFFER_SIZE << std::endl;
 
-    Add add; Mul mul;
-    Z z; ComplexChild cc;
-
-    z.a = 5;
-    z.b = 'a';
-    z.x = 7;
-    z.flag = true;
-
-    add.a = 5; add.b = 7;
-    
-    mul.a = 5; mul.b = 7;
-    mul.flag = false;
+    ComplexChild cc;
 
     cc.v.push_back(0);
     cc.vv.push_back(1);
 
-    std::vector<Add> addons(2);
-    addons[0] = add;
-    add.b -= 1;
-    addons[1] = add;
+    //std::vector<VirtualChild1> addons(2);
+    //addons[0] = add;
+    //add.b -= 1;
+    //addons[1] = add;
 
-    std::map<char, Add> addons2;
-    addons2['#'] = add;
-    add.b += 1;
-    addons2['a'] = add;
+    //std::map<char, VirtualChild1> addons2;
+    //addons2['#'] = add;
+    //add.b += 1;
+    //addons2['a'] = add;
 
     std::vector<std::vector<unsigned char>> m(2);
     m[0].resize(2); m[1].resize(5);
@@ -171,67 +160,90 @@ int main(int argc, char* argv[])
     m[1][0] = 3; m[1][1] = 4; m[1][2] = 5; m[1][3] = 6; m[1][4] = 7;
 
     std::list<char> l = { 'A', '0', '#' };
-    std::list<Add> l2(addons.begin(), addons.end());
+    //std::list<VirtualChild1> l2(addons.begin(), addons.end());
 
-#define PRINT_LAYOUT(X) PrintLayout< X > ( #X )
+#define PRINT_LAYOUT(X) PrintLayout< X > ()
 
     {
     const int const_test = argc;
     PRINT_LAYOUT(const int);
     Test(&const_test, "argc.bin");
     }
-
-    PRINT_LAYOUT(Z);
-    Test<Z, true>(&z, "Z.bin");
-
-    PRINT_LAYOUT(Add);
-    Test<Add, true>(&add, "Add.bin");
-
-    PRINT_LAYOUT(Mul);
-    Test(&mul, "Mul.bin");
-
     {
-        ClassWithStrongPtr cp(10);
-        PrintLayout("ClassWithStrongPtr", &cp);
-        Test(&cp, "class_strong_ptr.bin");
+        POD pod;
+        POD2 pod2;
+        X x;
+        Y y;
+
+        pod.a = 2; pod.b = -3.14;
+        pod2.a = 'A'; pod2.b = 'B';
+        pod2.c = true;
+
+        static_cast<POD2&>(x) = pod2;
+        x.x = 3;
+
+        static_cast<X&>(y) = x;
+        y.flag = true;
+
+        PRINT_LAYOUT(POD);
+        Test<POD, true>(&pod, "pod1.bin");
+
+        PRINT_LAYOUT(POD2);
+        Test<POD2, false>(&pod2, "pod2.bin");
+
+        PRINT_LAYOUT(X);
+        Test<X, true>(&x, "pod3.bin");
+
+        PRINT_LAYOUT(Y);
+        Test<Y, false>(&y, "pod4.bin");
     }
+    {
+        VirtualChild1 vc1;
+        VirtualChild2 vc2;
 
-	{
-		ClassWithWeakPtr cp(10);
+        vc1.a = 5; vc1.b = 7;
+        static_cast<VirtualParent&>(vc2) = vc1;
+        vc2.i = 11;
+        vc2.x = -3.14;
+
+        PRINT_LAYOUT(VirtualChild1);
+        Test<VirtualChild1, true>(&vc1, "virtual1.bin");
+
+        PRINT_LAYOUT(VirtualChild2);
+        Test<VirtualChild2, false>(&vc2, "virtual2.bin");
+    }
+    {
+        ClassWithStrongPtr cp1(10);
+        PrintLayout(&cp1);
+        Test(&cp1, "strong_ptr.bin");
+    
+        ClassWithWeakPtr cp2(10);
 		PRINT_LAYOUT(ClassWithWeakPtr);
-		Test(&cp, "class_weak_ptr.bin");
-	}
-
-	{
-		ClassWithUnusedData cp;
+		Test(&cp2, "weak_ptr.bin");
+		
+        ClassWithUnusedData cp3;
 		PRINT_LAYOUT(ClassWithUnusedData);
-		Test<ClassWithUnusedData, true>(&cp, "class_with_unused.bin");
+		Test(&cp3, "unused.bin");
 	}
+    return 0;
     {
         std::vector<int> simple_v;
-        PrintLayout("vector<int>", &simple_v);
+        PrintLayout(&simple_v);
         Test(&simple_v, "emptyvector.bin");
         simple_v.push_back(1); simple_v.push_back(2); simple_v.push_back(3);
+        PrintLayout(&simple_v);
         Test(&simple_v, "vectorint.bin");
     }
     {
-        std::vector<MyParent> vs;
+        std::vector<POD> vs;
         vs.emplace_back(); vs.back().a = 1;
         vs.emplace_back(); vs.back().a = 2;
-        PrintLayout("vector_simple", &vs);
+        PrintLayout(&vs);
         Test(&vs, "vector_simple.bin");
     }
 
-    PrintLayout("ComplexChild", &cc);
+    PrintLayout(&cc);
     Test(&cc, "ComplexChild.bin");
-
-    {
-    std::vector<Odd> vo;
-    vo.emplace_back(); vo.back().a = 1;
-    vo.emplace_back(); vo.back().a = 2;
-    PrintLayout("vector_odd", &vo);
-    Test(&vo, "vector_odd.bin");
-    }
 
     //{
     //    std::vector<wc::ResponsiblePtr<Odd>> vp;
@@ -241,24 +253,24 @@ int main(int argc, char* argv[])
     //    Test(&vp, "vector_ptr.bin");
     //}
 
-    PrintLayout("vector_vector", &m);
+    PrintLayout(&m);
     Test(&m, "vector_vector.bin");
 
-    PrintLayout("list_char", &l);
+    PrintLayout(&l);
     Test(&l, "list_char.bin");
 
-    PrintLayout("list_Add", &l2);
-    Test(&l2, "list_Add.bin");
+    //PrintLayout(&l2);
+    //Test(&l2, "list_Add.bin");
 
     l.clear();
-    PrintLayout("empty_list", &l);
+    PrintLayout(&l);
     Test(&l, "empty_list.bin");
 
     printf("Succeeded!\n");
     return 0;
 
-    printf("Map of Add ");
-    Test(&addons2, "map_add.bin");
+    //printf("Map of Add ");
+    //Test(&addons2, "map_add.bin");
 
     return 0;
 }

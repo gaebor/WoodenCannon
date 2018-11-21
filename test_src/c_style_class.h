@@ -4,70 +4,67 @@
 #include "wc.h"
 #include <stddef.h>
 
-//! POD 
-class MyParent
+//! a plain old data, although the wc::MembersOf is not specified.
+class POD
 {
 public:
-    bool operator==(const MyParent& other)const{return a == other.a && b == other.b;}
+    bool operator==(const POD& other)const;
     int a;
     double b;
 };
 
-struct Odd
+//! a plain old data, the wc::MembersOf is properly specified.
+struct POD2
 {
 public:
-    //Odd(int a = 0, char c = 'o') :a(a), c(c){}
-    bool operator==(const Odd& other)const{ return a == other.a && c == other.c;}
+    bool operator==(const POD2& other)const;
     char a;
-    char c;
-    char d;
+    char b;
+    bool c;
 };
+
 namespace wc {
     template<>
-    struct MembersOf<Odd> : Members<Odd,
-        Member<Odd, offsetof(Odd, a), decltype(Odd::a)>,
-        Member<Odd, offsetof(Odd, c), decltype(Odd::c)>,
-        Member<Odd, offsetof(Odd, d), decltype(Odd::d)>>
+    struct MembersOf<POD2> : Members<POD2,
+        Member<POD2, offsetof(POD2, a), decltype(POD2::a)>,
+        Member<POD2, offsetof(POD2, b), decltype(POD2::b)>,
+        Member<POD2, offsetof(POD2, c), decltype(POD2::c)>>
     {};
 }
 
-class X : public MyParent
+//! inheritance from plain old data
+class X : public POD2
 {
 public:
+    bool operator==(const X& other)const;
     int x;
 };
 
-class Y : public MyParent
-{
-public:
-    char y;
-};
+namespace wc {
+    template<>
+    struct MembersOf<X> : Members<X,
+        Member<X, offsetof(X, x), decltype(X::x)>>
+    {};
+    template<>
+    struct ParentsOf<X> : Parents<X, POD2>
+    {};
+}
 
-class Z : public X
+//! still plain old data, but the inheritance structure is not well defined
+class Y : public X
 {
 public:
     bool flag;
-    bool operator==(const Z& other)const;
+    bool operator==(const Y& other)const;
 };
 
 namespace wc {
-    /*! these members are falsely advertised as members of Z
-        a and b are inherited from MyParent, flag is a true member.
-        But this works also! For wc it doesn't matter how you got the members, as long as they have correct offsets and types.
-        However wc::Stitcher<Z>::Custom will behave as Z ha no parent.
-
-        Also note that the member int X::x is totally missing, which is also fine, as long as
-        the missing member is POD and you don't want the network byte order
-    */
     template<>
-    struct MembersOf<Z> : Members<Z,
-        Member<Z, offsetof(Z, a), decltype(Z::a)>,
-        Member<Z, offsetof(Z, b), decltype(Z::b)>,
-        Member<Z, offsetof(Z, flag), decltype(Z::flag)>>
+    struct MembersOf<Y> : Members<Y,
+        Member<Y, offsetof(Y, a), decltype(Y::a)>,
+        Member<Y, offsetof(Y, x), decltype(Y::x)>,
+        Member<Y, offsetof(Y, flag), decltype(Y::flag)>>
     {};
-
 }
-
-
 
 #endif //INCLUDE_C_STYLE_H

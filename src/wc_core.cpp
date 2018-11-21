@@ -18,22 +18,13 @@
 #endif
 
 namespace wc {
-
-static THREAD Buffer buffer;
-static THREAD bool serialize = false;
-
-THREAD std::unordered_set<void*> allocated_pointers;
-static bool IsFamiliar(void* ptr)
-{
-	return allocated_pointers.find(ptr) != allocated_pointers.end();
-}
-
-static std::bad_alloc nomem;
+    extern THREAD Buffer buffer;
+    extern THREAD bool serialize;
 
 void Serializer::callback_one()
 {
     buffer.Clear();
-	allocated_pointers.clear();
+    buffer.Allocate(0);
     serialize = true;
 }
 
@@ -111,62 +102,4 @@ const char* get_compile_info()
     return WC_COMPILED_CONFIG;
 }
 
-}
-
-void* operator new (size_t count, const std::nothrow_t&) throw()
-{
-    try{
-        return operator new (count);
-    }
-    catch (std::exception&){
-        return nullptr;
-    }
-}
-
-#if __GNUC__ == 4 && (__GNUC_MINOR__ < 9)
-// see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56019
-#define max_align_t_namespace 
-#else 
-#define max_align_t_namespace std
-#endif
-
-typedef wc::RoundD<size_t, alignof(max_align_t_namespace::max_align_t)> rounder;
-
-void* operator new (size_t count)
-{
-    if (wc::serialize)
-    {
-        const auto former_size = wc::buffer.GetSize();
-        const auto former_size_round = rounder::Do(former_size);
-
-        wc::serialize = false;
-		//--------------------
-        if (former_size_round != former_size)
-            wc::buffer.Allocate(former_size_round - former_size);
-        auto result = wc::buffer.Allocate(count);
-		wc::allocated_pointers.insert(result);
-		//--------------------
-        wc::serialize = true;
-        return result;
-    }
-    else
-    {
-        auto const ptr = malloc(count);
-        if (ptr)
-            return ptr;
-        else
-            throw wc::nomem;
-    }
-}
-
-void operator delete(void* ptr) noexcept
-{
-	if (!wc::serialize || !wc::IsFamiliar(ptr))
-		free(ptr);
-}
-
-void operator delete(void* ptr, const std::nothrow_t&) noexcept
-{
-	if (!wc::serialize || !wc::IsFamiliar(ptr))
-		free(ptr);
 }

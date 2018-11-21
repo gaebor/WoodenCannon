@@ -17,7 +17,6 @@ namespace wc{
 
     BufferType* Buffer::GetNew(size_t s)
     {
-        // OrderedType::const_iterator adjacent;
         while (blockSize_ < s)
             blockSize_ *= 2;
         BufferType* new_buffer = nullptr;
@@ -38,7 +37,7 @@ namespace wc{
 		{
 			return GetNew(s)->data();
 		}
-        auto last = *(--buffers_.end());
+        auto last = buffers_.back();
         if (last->size() + s <= last->capacity())
         { // fits in the last buffer
             auto end = last->data() + last->size();
@@ -94,17 +93,21 @@ namespace wc{
     {
         if (ordered_.size() == 0)
             return false; // no blocks so far
-        if (candidate->data() + candidate->size() < ordered_.begin()->first)
+        const auto begin = candidate->data();
+        const auto end = begin + candidate->size();
+
+        if (end < ordered_.begin()->first)
             return false; // before the first
-        auto last = (--ordered_.end())->second;
-        if (candidate->data() > last->data() + last->size())
+        
+        auto last = ordered_.rbegin()->second;
+        if (begin > last->data() + last->size())
             return false; // after the last
-        auto before = (--ordered_.upper_bound(candidate->data()))->second;
-        auto after = before;
-        ++after;
-        return
-            before->data() + before->size() < candidate->data() && 
-            candidate->data() < after->data();
+        auto before_it = ordered_.upper_bound(candidate->data());
+        const auto after = before_it->first;
+        --before_it;
+        const auto before = before_it->second;
+        
+        return before->data() + before->size() < begin && end < after;
     }
 
     BufferType* Buffer::GetFirst()

@@ -2,6 +2,7 @@
 #define INCLUDE_WC_H
 
 #include "wc_core.h"
+#include "wc_functions.h"
 
 //namespace wc{
 //    template<class C>

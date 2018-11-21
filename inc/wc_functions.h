@@ -1,16 +1,8 @@
 #ifndef INCLUDE_WC_FUNCTIONS_H
 #define INCLUDE_WC_FUNCTIONS_H
 
-#include <stddef.h>
 #include <vector>
 #include <stdio.h>
-#include <new>
-
-void* operator new (size_t count);
-void* operator new (size_t count, const std::nothrow_t& tag) throw();
-
-void operator delete (void* ptr) noexcept;
-void operator delete (void* ptr, const std::nothrow_t&) noexcept;
 
 namespace wc {
     template<class Int, size_t d>
@@ -52,7 +44,7 @@ namespace wc {
     /*!
     If there is an already serialized object in the buffer, that might get compromised!
     */
-    void SetMax(size_t bytes);
+    // void SetMax(size_t bytes);
 }
 
 #endif // INCLUDE_WC_FUNCTIONS_H

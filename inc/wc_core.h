@@ -1,9 +1,6 @@
 #ifndef INCLUDE_WC_CORE_H
 #define INCLUDE_WC_CORE_H
 
-#include <type_traits>
-#include <stddef.h>
-
 #include "wc_config.h"
 
 #include "wc_stitcher.h"
@@ -55,7 +52,7 @@ public:
         Stitcher<Class>::UnDo(thing);
         // calls an `operator=`
 		// the buffer now contains a proper Class object
-		target = *((Class*)thing);
+		target = *thing;
     }
     //! reconstructs an object from memory
     /*!

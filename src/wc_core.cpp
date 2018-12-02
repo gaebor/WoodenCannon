@@ -23,8 +23,7 @@ namespace wc {
 
 void Serializer::callback_one()
 {
-    buffer.Clear();
-    buffer.Allocate(0);
+    buffer.StartFresh();
     serialize = true;
 }
 

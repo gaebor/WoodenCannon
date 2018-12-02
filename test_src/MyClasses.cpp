@@ -1,7 +1,5 @@
 #include "MyClasses.h"
 
-static std::vector<int> v;
-
 ClassWithStrongPtr::ClassWithStrongPtr(int i) :i(i), b(new bool(true))
 {
 
@@ -41,21 +39,27 @@ bool ClassWithWeakPtr::operator==(const ClassWithWeakPtr& other)const
 
 ClassWithUnusedData::ClassWithUnusedData()
 {
-    v.push_back(v.size());
 }
 
-ClassWithUnusedData::ClassWithUnusedData(const ClassWithUnusedData&)
+ClassWithUnusedData::ClassWithUnusedData(const ClassWithUnusedData& other)
 {
-    v.push_back(v.size());
+    std::vector<size_t> unused;
+    for (size_t n = 2; n < 10; ++n)
+    {
+        size_t d;
+        for (d = 2; d < n; ++d)
+            if (n%d == 0)
+                break;
+        if (d == n)
+            unused.push_back(n);
+    }
 }
 
 ClassWithUnusedData::~ClassWithUnusedData()
 {
-    v.push_back(v.size());
 }
 
 bool ClassWithUnusedData::operator== (const ClassWithUnusedData&)const
 {
-    v.push_back(v.size());
 	return true;
 }

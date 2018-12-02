@@ -20,9 +20,5 @@ endif(WIN32)
 
 add_dependencies(testwc wc)
 
-add_test(NAME one COMMAND cmake -E remove -f 
-            argc.bin pod1.bin pod2.bin pod3.bin pod4.bin
-            virtual1.bin virtual2.bin
-            strong_ptr.bin weak_ptr.bin unused.bin)
-add_test(NAME two COMMAND testwc)
-add_test(NAME three COMMAND testwc)
+add_test(NAME serialize COMMAND testwc -o -n 1000000)
+add_test(NAME reconstruct COMMAND testwc)

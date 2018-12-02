@@ -16,6 +16,9 @@
 #include "responsible_member.h"
 #include "MyClasses.h"
 
+bool ommit_previous = false;
+size_t repeate = 100;
+
 struct LayoutPrinter
 {
     LayoutPrinter(void* x = nullptr) : base(x){}
@@ -82,17 +85,18 @@ template<class T, bool assign = false>
 void Test(T* original, const char* fname)
 {
 	wc::BufferType* buffer;
-	FILE* f = fopen(fname, "rb");
+    FILE* f;
 	try
 	{
-		if (f)
+		if ((!ommit_previous) && (f = fopen(fname, "rb")))
 		{   // reads from file into buffer
 			wc::ReadBuffer(f);
 			fclose(f);
 		}
 		else
 		{  // serializes
-			wc::Serializer::Do(original);
+            for (size_t i = 0; i < repeate; ++i)
+    			wc::Serializer::Do(original);
 		}
 
 		wc::PrintBuffer();
@@ -137,6 +141,15 @@ FAILED:
 
 int main(int argc, char* argv[])
 {
+    for (++argv; *argv; ++argv)
+    {
+        const std::string arg = *argv;
+        if ((arg == "-n" || arg == "--repeat") && *(argv + 1) && atoi(*(argv+1)) > 0)
+            repeate = atoi(*++argv);
+        if (arg == "-o" || arg == "--omit" || arg == "--overwite")
+            ommit_previous = true;
+    }
+
     std::cout << wc::get_compile_info() << " initial buffer: " << WC_INITIAL_BUFFER_SIZE << std::endl;
 
     ComplexChild cc;
@@ -165,7 +178,7 @@ int main(int argc, char* argv[])
 #define PRINT_LAYOUT(X) PrintLayout< X > ()
 
     {
-    const int const_test = argc;
+    const int const_test = 1;
     PRINT_LAYOUT(const int);
     Test(&const_test, "argc.bin");
     }

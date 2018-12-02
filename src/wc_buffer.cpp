@@ -7,7 +7,7 @@ namespace wc{
 
     Buffer::Buffer() : blockSize_(WC_INITIAL_BUFFER_SIZE), size_(0), ordered_()
     {
-        GetNew();
+        StartFresh();
     }
 
     Buffer::~Buffer()
@@ -48,6 +48,20 @@ namespace wc{
 		{
 			return GetNew(s)->data();
 		}
+    }
+
+    void Buffer::StartFresh()
+    {
+        if (buffers_.size() == 1)
+        {
+            GetFirst()->clear();
+            size_ = 0;
+        }
+        else
+        {
+            Clear();
+            Allocate(0);
+        }
     }
 
     void Buffer::ReArrange()
@@ -94,20 +108,23 @@ namespace wc{
         if (ordered_.size() == 0)
             return false; // no blocks so far
         const auto begin = candidate->data();
-        const auto end = begin + candidate->size();
+        const auto end = begin + candidate->capacity();
 
         if (end < ordered_.begin()->first)
             return false; // before the first
         
         auto last = ordered_.rbegin()->second;
-        if (begin > last->data() + last->size())
+        if (begin > last->data() + last->capacity())
             return false; // after the last
         auto before_it = ordered_.upper_bound(candidate->data());
         const auto after = before_it->first;
         --before_it;
         const auto before = before_it->second;
-        
-        return before->data() + before->size() < begin && end < after;
+
+        //              |candidate|
+        // [ before   ) [begin end) [after ...)
+
+        return !((before->data() + before->capacity()) < begin && end < after);
     }
 
     BufferType* Buffer::GetFirst()

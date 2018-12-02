@@ -24,10 +24,11 @@ namespace wc{
         size_t GetBlockSize()const;
         //! allocates given bytes into internal buffer(s)
         /*!
-			basically, this imitates malloc
+			basically, this overrides operator new
             may throw
         */
         void* Allocate(size_t s);
+        void StartFresh();
         ~Buffer();
         BufferType* GetFirst();
         //! melts the blocks together

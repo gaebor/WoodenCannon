@@ -26,9 +26,9 @@ public:
 namespace wc {
     template<>
     struct MembersOf<POD2> : Members<POD2,
-        Member<POD2, offsetof(POD2, a), decltype(POD2::a)>,
-        Member<POD2, offsetof(POD2, b), decltype(POD2::b)>,
-        Member<POD2, offsetof(POD2, c), decltype(POD2::c)>>
+        Member2<decltype(&POD2::a), &POD2::a>,
+        Member2<decltype(&POD2::b), &POD2::b>,
+        Member2<decltype(&POD2::c), &POD2::c>>
     {};
 }
 
@@ -43,7 +43,7 @@ public:
 namespace wc {
     template<>
     struct MembersOf<X> : Members<X,
-        Member<X, offsetof(X, x), decltype(X::x)>>
+        Member2<decltype(&X::x), &X::x>>
     {};
     template<>
     struct ParentsOf<X> : Parents<X, POD2>
@@ -61,9 +61,9 @@ public:
 namespace wc {
     template<>
     struct MembersOf<Y> : Members<Y,
-        Member<Y, offsetof(Y, a), decltype(Y::a)>,
-        Member<Y, offsetof(Y, x), decltype(Y::x)>,
-        Member<Y, offsetof(Y, flag), decltype(Y::flag)>>
+        Member2<decltype(&Y::a), &Y::a>,
+        Member2<decltype(&Y::x), &Y::x>,
+        Member2<decltype(&Y::flag), &Y::flag>>
     {};
 }
 

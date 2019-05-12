@@ -1,6 +1,8 @@
 #ifndef INCLUDE_WC_PARENTS_H
 #define INCLUDE_WC_PARENTS_H
 
+#include <type_traits>
+
 namespace wc {
 
     template<class C> struct Stitcher;
@@ -20,6 +22,7 @@ namespace wc {
     template <class C, class P, typename ...Arguments>
     struct Parents<C, P, Arguments...>
     {
+        static_assert(std::is_base_of<P, C>::value, "Not a base class!");
         typedef Parents<C, Arguments...> Next;
         template<typename F>
         static void Custom(F& f, const C* x)

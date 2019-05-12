@@ -16,8 +16,8 @@ public:
 namespace wc {
     template<>
     struct MembersOf<VirtualParent> : Members<VirtualParent,
-        Member<VirtualParent, offsetof(VirtualParent, a), int>,
-        Member<VirtualParent, offsetof(VirtualParent, b), int>>
+        Member2<decltype(&VirtualParent::a), &VirtualParent::a>,
+        Member2<decltype(&VirtualParent::b), &VirtualParent::b>>
     {};
 }
 
@@ -29,9 +29,29 @@ public:
     ~VirtualChild1(){}
 };
 
+class VirtualChild11 : public VirtualChild1
+{
+public:
+    VirtualChild11() {}
+    virtual int Op();
+    ~VirtualChild11() {}
+};
+
 namespace wc {
     template<>
     struct ParentsOf<VirtualChild1> : Parents<VirtualChild1, VirtualParent>
+    {};
+
+    template<>
+    struct ParentsOf<VirtualChild11> : Parents<VirtualChild11, VirtualChild1>
+    {};
+
+    template<>
+    struct PolymorphChildrenOf<VirtualParent> : PolymorphChildren<VirtualParent, VirtualChild1>
+    {};
+
+    template<>
+    struct PolymorphChildrenOf<VirtualChild1> : PolymorphChildren<VirtualChild1, VirtualChild11>
     {};
 }
 
@@ -56,7 +76,7 @@ namespace wc {
     template<>
     struct MembersOf<VirtualParent2> :
         Members<VirtualParent2,
-            Member<VirtualParent2, offsetof(VirtualParent2, i), int>
+        Member2<decltype(&VirtualParent2::i), &VirtualParent2::i>
         >
     {};
 
@@ -68,7 +88,7 @@ namespace wc {
     template<>
     struct MembersOf<VirtualChild2> :
         Members<VirtualChild2,
-        Member<VirtualChild2, offsetof(VirtualChild2, x), double>
+        Member2<decltype(&VirtualChild2::x), &VirtualChild2::x>
         >
     {};
 

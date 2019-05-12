@@ -33,3 +33,8 @@ bool VirtualChild2::operator==(const VirtualChild2& other) const
         static_cast<const VirtualParent2&>(*this) == other &&
         x == other.x;
 }
+
+int VirtualChild11::Op()
+{
+    return 0;
+}

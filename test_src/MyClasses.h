@@ -28,14 +28,14 @@ public:
 namespace wc {
     template<>
     struct MembersOf<ClassWithStrongPtr> : Members<ClassWithStrongPtr,
-        Member<ClassWithStrongPtr, offsetof(ClassWithStrongPtr, i), int>,
-        Responsible<ClassWithStrongPtr, offsetof(ClassWithStrongPtr, b), bool>>
+        Member2<decltype(&ClassWithStrongPtr::i), &ClassWithStrongPtr::i>,
+        Responsible2<decltype(&ClassWithStrongPtr::b), &ClassWithStrongPtr::b>>
     {};
 
 	template<>
 	struct MembersOf<ClassWithWeakPtr> : Members<ClassWithWeakPtr,
-		Member<ClassWithWeakPtr, offsetof(ClassWithWeakPtr, i), int>,
-		Pointer<ClassWithWeakPtr, offsetof(ClassWithWeakPtr, p)>>
+        Member2<decltype(&ClassWithWeakPtr::i), &ClassWithWeakPtr::i>,
+        Pointer2<decltype(&ClassWithWeakPtr::p), &ClassWithWeakPtr::p>>
 	{};
 }
 

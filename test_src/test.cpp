@@ -15,6 +15,7 @@
 #include "complex_type.h"
 #include "responsible_member.h"
 #include "MyClasses.h"
+#include "test_diamond.h"
 
 bool ommit_previous = false;
 size_t repeate = 100;
@@ -238,6 +239,24 @@ int main(int argc, char* argv[])
 		PRINT_LAYOUT(ClassWithUnusedData);
 		Test(&cp3, "unused.bin");
 	}
+    {
+        D0 d0; D1 d1; D2 d2; D3 d3;
+
+        static_cast<D1&>(d3).d0 = -1;
+        static_cast<D2&>(d3).d0 = -2;
+        d3.d1 = 1; d3.d2 = 2; d3.d3 = 3;
+
+        PrintLayout(&d3);
+        Test(&d3, "d3.bin");
+
+        V0 v0; V1 v1; V2 v2; V3 v3;
+
+        v3.v0 = 4; v3.v1 = 1; v3.v2 = 2; v3.v3 = 3;
+
+        PrintLayout(&v3);
+        Test(&v3, "v3.bin");
+
+    }
     return 0;
     {
         std::vector<int> simple_v;

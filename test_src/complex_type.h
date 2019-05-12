@@ -32,21 +32,21 @@ namespace wc{
     template<>
     struct MembersOf<ComplexParent> :
         Members<ComplexParent,
-            Member<ComplexParent, offsetof(ComplexParent, v), std::vector<int>>
+            Member2<decltype(&ComplexParent::v), &ComplexParent::v>
         >
     {};
 
     template<>
     struct MembersOf<ComplexParent2> : 
         Members<ComplexParent2,
-            Member<ComplexParent2, offsetof(ComplexParent2, w), std::vector<int>>
+            Member2<decltype(&ComplexParent2::w), &ComplexParent2::w>
         >
     {};
 
     template<>
     struct MembersOf<ComplexChild> :
         Members<ComplexChild,
-            Member<ComplexChild, offsetof(ComplexChild, vv), std::vector<int>>
+        Member2<decltype(&ComplexChild::vv), &ComplexChild::vv>
         >
     {};
 

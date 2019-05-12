@@ -45,14 +45,6 @@ namespace wc {
     template<>
     struct ParentsOf<VirtualChild11> : Parents<VirtualChild11, VirtualChild1>
     {};
-
-    template<>
-    struct PolymorphChildrenOf<VirtualParent> : PolymorphChildren<VirtualParent, VirtualChild1>
-    {};
-
-    template<>
-    struct PolymorphChildrenOf<VirtualChild1> : PolymorphChildren<VirtualChild1, VirtualChild11>
-    {};
 }
 
 class VirtualParent2

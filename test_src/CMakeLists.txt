@@ -21,4 +21,5 @@ endif(WIN32)
 add_dependencies(testwc wc)
 
 add_test(NAME serialize COMMAND testwc -o -n 1000000)
+add_test(NAME short COMMAND testwc -o -n 1000)
 add_test(NAME reconstruct COMMAND testwc)

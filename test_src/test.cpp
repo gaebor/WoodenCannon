@@ -257,7 +257,6 @@ int main(int argc, char* argv[])
         Test(&v3, "v3.bin");
 
     }
-    return 0;
     {
         std::vector<int> simple_v;
         PrintLayout(&simple_v);
